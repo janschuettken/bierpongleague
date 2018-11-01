@@ -1,11 +1,13 @@
 package jan.schuettken.bierpongleague.data;
 
+import java.io.Serializable;
+
 /**
  * Created by Jan Schüttken on 30.10.2018 at 22:36
  */
-public class UserData {
+public class UserData implements Serializable {
     private int id;
-    private String username, firstName, lastName, nickName;
+    private String username, firstName, lastName, nickName, password, email;
 
     //TODO es fehlen noch einige Infos - UserData sollte den gesamten Datenbank Eintrag abbilden
 
@@ -50,5 +52,21 @@ public class UserData {
 
     public void setNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

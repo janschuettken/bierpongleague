@@ -2,6 +2,7 @@ package jan.schuettken.bierpongleague.activities;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 
 import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.basic.BasicPage;
@@ -21,18 +22,21 @@ public class StartActivity extends BasicPage {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+        doBackgroundLogin();
+    }
+
+    private void doBackgroundLogin() {
         final Handler handler = new Handler();
         new Thread() {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(500);
                 } catch (InterruptedException ignored) {
                 }
                 checkLogin(handler);
             }
         }.start();
-
     }
 
     private void checkLogin(Handler handler) {
@@ -44,7 +48,7 @@ public class StartActivity extends BasicPage {
             password = prefHandler.getPassword();
         } catch (EmptyPreferencesException e) {
             switchView(LoginActivity.class, true, handler);
-            return;
+            return; //otherwise it crashes ;)
         }
 
 
@@ -56,11 +60,13 @@ public class StartActivity extends BasicPage {
 
         } catch (InvalidLoginException e) {
             switchView(LoginActivity.class, true, handler);
-            return;
-        } catch (NoConnectionException e) {
-            //TODO OfflineMode - show retry button
-        } catch (DatabaseException e) {
-            //TODO try again - stay in activity
+        } catch (NoConnectionException | DatabaseException e) {
+            findViewById(R.id.retry_connect_to_server).setVisibility(View.VISIBLE);
         }
+    }
+
+    public void retryConnectToServer(View view) {
+        showToast(R.string.no_internet_connection);
+        doBackgroundLogin();
     }
 }

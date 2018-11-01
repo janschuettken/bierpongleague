@@ -10,6 +10,7 @@
     <string name="league">league</string>
     <string name="played_games">Gespielte Spiele</string>
     <string name="title_activity_login">Anmelden</string>
+    <string name="title_activity_add_game">Neues Spiel</string>
     <!-- Strings related to login -->
     <string name="prompt_username">Username</string>
     <string name="prompt_password">Passwort</string>
@@ -23,5 +24,17 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="comming_soon">Gedult haben du musst</string>
+    <string name="no_internet_connection">Das Internet ist zwar Neuland, trotzdem musst du dich verbinden!</string>
+    <string name="hint_first_name">Vorname</string>
+    <string name="hint_last_name">Nachname</string>
+    <string name="hint_mail">E-Mail Adresse</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_nick_name">Spitzname (optional)</string>
+    <string name="hint_password">Passwort</string>
+    <string name="to_short">Zu kurz</string>
+    <string name="player">Spieler</string>
+    <string name="score">Score</string>
+    <string name="hit_cups">Getroffene Becher</string>
 
 </resources>

@@ -79,6 +79,7 @@
                     android:background="@drawable/round_button_white"
                     android:text="@string/action_register"
                     android:textColor="@color/colorAccent"
+                    android:onClick="register"
                     android:textStyle="bold" />
 
                 <Button

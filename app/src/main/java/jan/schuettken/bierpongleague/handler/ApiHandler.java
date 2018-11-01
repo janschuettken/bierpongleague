@@ -2,6 +2,7 @@ package jan.schuettken.bierpongleague.handler;
 
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +34,10 @@ public class ApiHandler {
         return session;
     }
 
+    public boolean hasSession() {
+        return session == null;
+    }
+
     /**
      * @param session Sets the session id<br>You can get one from: {@link #login(String, String) login}
      */
@@ -44,6 +49,7 @@ public class ApiHandler {
      * For an description look at  {@link #login(String, String) login}
      */
     public ApiHandler(@NonNull String username, @NonNull String password) throws InvalidLoginException, NoConnectionException, DatabaseException {
+        this();
         login(username, password);
     }
 
@@ -51,7 +57,14 @@ public class ApiHandler {
      * @param session A session id is required - if you have non use: {@link #ApiHandler(String, String) ApiHandler}
      */
     public ApiHandler(@NonNull String session) {
+        this();
         this.session = session;
+    }
+
+    /**
+     * ONLY USE FOR REGISTER
+     */
+    public ApiHandler() {
         this.serverHandler = new ServerHandler();
     }
 
@@ -143,9 +156,10 @@ public class ApiHandler {
      */
     public boolean login(@NonNull String username, @NonNull String password)
             throws NoConnectionException, InvalidLoginException, DatabaseException {
-
-        String fileUrl = SERVER_URL + "login.php?username=" + username + "&password=" + password;
+        String fileUrl = SERVER_URL + "login.php?user=" + username + "&password=" + password;
+        Log.e("LOGIN", fileUrl);
         String response = serverHandler.getJsonFromServer(fileUrl);
+        Log.e("LOGIN", response);
         if (response.startsWith("#fail#wrongPassword") || response.startsWith("#fail#usernameNotTaken"))
             throw new InvalidLoginException(response);
         if (response.startsWith("#fail#"))
@@ -155,6 +169,11 @@ public class ApiHandler {
         return true;
     }
 
+
+    public boolean register(UserData user) {
+        //TODO  Methode erstellen
+        return false;
+    }
 
     //TODO JAVADOC einfügen
     public List<GameData> getGames(@NonNull UserData user)

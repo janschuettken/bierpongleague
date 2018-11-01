@@ -39,8 +39,16 @@ public class PreferencesHandler {
         return getPrefWithException(USERNAME_PREF);
     }
 
+    public boolean setUsername(String username) {
+        return saveDataToPrefs(USERNAME_PREF, username);
+    }
+
     public String getPassword() throws EmptyPreferencesException {
         return getPrefWithException(PASSWORD_PREF);
+    }
+
+    public boolean setPassword(String password) {
+        return saveDataToPrefs(PASSWORD_PREF, password);
     }
 
     public String getUserId() throws EmptyPreferencesException {

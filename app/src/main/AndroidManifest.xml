@@ -4,6 +4,8 @@
     package="jan.schuettken.bierpongleague">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
@@ -17,7 +19,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
-        <!-- TODO App index wraning geht wen, wenn die app im store ist -->
+        <!-- TODO App index warning geht weg, wenn die app im store ist -->
         <activity
             android:name=".activities.OverviewActivity"
             android:label="@string/app_name"
@@ -28,12 +30,16 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login" />
+        <activity android:name=".activities.RegisterActivity" />
+        <activity android:name=".activities.AddGameActivity"
+            android:parentActivityName=".activities.OverviewActivity"/>
     </application>
 
 </manifest>
