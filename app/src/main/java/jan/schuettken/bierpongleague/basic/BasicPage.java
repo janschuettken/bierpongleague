@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -36,6 +37,15 @@ public class BasicPage extends AppCompatActivity implements PageInterfaceLarge {
     @Override
     public void switchView(Class<?> o, boolean finish) {
         switchView(o, finish, false);
+    }
+
+    public void switchView(final Class<?> o, final boolean finish, Handler handler) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                switchView(o, finish, false);
+            }
+        });
     }
 
     public boolean switchView(String packageName, String className) {

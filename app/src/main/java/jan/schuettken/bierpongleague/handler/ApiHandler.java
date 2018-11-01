@@ -13,10 +13,9 @@ import java.util.List;
 import jan.schuettken.bierpongleague.data.GameData;
 import jan.schuettken.bierpongleague.data.UserData;
 import jan.schuettken.bierpongleague.exceptions.DatabaseException;
+import jan.schuettken.bierpongleague.exceptions.InvalidLoginException;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
-import jan.schuettken.bierpongleague.exceptions.UsernameTakenException;
-import jan.schuettken.bierpongleague.exceptions.WrongPasswordException;
 
 /**
  * Created by Jan Schüttken on 30.10.2018 at 21:23
@@ -44,7 +43,7 @@ public class ApiHandler {
     /**
      * For an description look at  {@link #login(String, String) login}
      */
-    public ApiHandler(@NonNull String username, @NonNull String password) throws UsernameTakenException, WrongPasswordException, NoConnectionException, DatabaseException {
+    public ApiHandler(@NonNull String username, @NonNull String password) throws InvalidLoginException, NoConnectionException, DatabaseException {
         login(username, password);
     }
 
@@ -138,20 +137,17 @@ public class ApiHandler {
      * @param username the Username of the UserData
      * @param password the matching Password
      * @return true: the new SessionId is set in the {@link #getSession() session} Parameter of this class
-     * @throws NoConnectionException  Connection Timeout
-     * @throws UsernameTakenException Username is already taken
-     * @throws WrongPasswordException Password does not match the Username
-     * @throws DatabaseException      Internal server error - maybe the server crashed?
+     * @throws NoConnectionException Connection Timeout
+     * @throws InvalidLoginException Password does not match the Username
+     * @throws DatabaseException     Internal server error - maybe the server crashed?
      */
     public boolean login(@NonNull String username, @NonNull String password)
-            throws NoConnectionException, UsernameTakenException, WrongPasswordException, DatabaseException {
+            throws NoConnectionException, InvalidLoginException, DatabaseException {
 
         String fileUrl = SERVER_URL + "login.php?username=" + username + "&password=" + password;
         String response = serverHandler.getJsonFromServer(fileUrl);
-        if (response.startsWith("#fail#usernameNotTaken"))
-            throw new UsernameTakenException(response);
-        if (response.startsWith("#fail#wrongPassword"))
-            throw new WrongPasswordException(response);
+        if (response.startsWith("#fail#wrongPassword") || response.startsWith("#fail#usernameNotTaken"))
+            throw new InvalidLoginException(response);
         if (response.startsWith("#fail#"))
             throw new DatabaseException(response);
 
