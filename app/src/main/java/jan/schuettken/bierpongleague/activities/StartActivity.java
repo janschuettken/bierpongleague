@@ -61,7 +61,13 @@ public class StartActivity extends BasicPage {
         } catch (InvalidLoginException e) {
             switchView(LoginActivity.class, true, handler);
         } catch (NoConnectionException | DatabaseException e) {
-            findViewById(R.id.retry_connect_to_server).setVisibility(View.VISIBLE);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    findViewById(R.id.retry_connect_to_server).setVisibility(View.VISIBLE);
+                }
+            });
+
         }
     }
 

@@ -175,13 +175,27 @@ public class ApiHandler {
         return false;
     }
 
-    //TODO JAVADOC einfügen
+    /**
+     * @param user the user
+     * @return a list of all Games from the user with userId
+     * @throws SessionErrorException session is not set or outdated
+     * @throws NoConnectionException Connection Timeout
+     * @throws JSONException         the file is bad - might be an server problem
+     * @throws RuntimeException      in here the server response is stored
+     */
     public List<GameData> getGames(@NonNull UserData user)
             throws NoConnectionException, SessionErrorException, RuntimeException, JSONException {
         return getGames(user.getId());
     }
 
-    //TODO JAVADOC einfügen
+    /**
+     * @param userId the id for the user
+     * @return a list of all Games from the user with userId
+     * @throws SessionErrorException session is not set or outdated
+     * @throws NoConnectionException Connection Timeout
+     * @throws JSONException         the file is bad - might be an server problem
+     * @throws RuntimeException      in here the server response is stored
+     */
     @NonNull
     public List<GameData> getGames(@IntRange(from = 0) int userId)
             throws SessionErrorException, NoConnectionException, RuntimeException, JSONException {
@@ -195,8 +209,7 @@ public class ApiHandler {
 
         //start parsing the JSON
         //TODO ich bin mir nich sicher, ob der Code so funktioniert! Er ist nicht getestet!
-        JSONObject jObjects = new JSONObject(response);
-        JSONArray gameObjects = jObjects.getJSONArray("");
+        JSONArray gameObjects = new JSONArray(response);
         ArrayList<GameData> games = new ArrayList<>();
         int playerCounter = 0, teamCounter = 0;
         int lastGameId = -1, lastScore = -1;
@@ -234,5 +247,52 @@ public class ApiHandler {
         }
 
         return games;
+    }
+
+    /**
+     * @return All User from the database
+     * @throws SessionErrorException session is not set or outdated
+     * @throws NoConnectionException Connection Timeout
+     * @throws JSONException         the file is bad - might be an server problem
+     * @throws RuntimeException      in here the server response is stored
+     */
+    public List<UserData> getUser() throws JSONException, SessionErrorException, RuntimeException, NoConnectionException {
+        String fileUrl = SERVER_URL + "getUser.php?session=" + session;
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response.equalsIgnoreCase("#fail#session error"))
+            throw new SessionErrorException(response);
+        if (response.startsWith("#fail#"))
+            throw new RuntimeException(response);
+
+        JSONArray gameObjects = new JSONArray(response);
+
+        ArrayList<UserData> user = new ArrayList<>();
+
+        for (int i = 0; i < gameObjects.length(); i++) {
+            JSONObject c = gameObjects.getJSONObject(i);
+            user.add(new UserData(c));
+        }
+        return user;
+    }
+
+    /**
+     * @return this will get a UserData of the current logged in User
+     * @throws SessionErrorException session is not set or outdated
+     * @throws NoConnectionException Connection Timeout
+     * @throws JSONException         the file is bad - might be an server problem
+     */
+    public UserData getYourself() throws NoConnectionException, SessionErrorException, JSONException {
+        String fileUrl = SERVER_URL + "getYourself.php?session=" + session;
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response.equalsIgnoreCase("#fail#session error"))
+            throw new SessionErrorException(response);
+        if (response.startsWith("#fail#"))
+            throw new RuntimeException(response);
+
+        JSONObject gameObject = new JSONObject(response);
+
+        UserData user = new UserData(gameObject);
+
+        return user;
     }
 }

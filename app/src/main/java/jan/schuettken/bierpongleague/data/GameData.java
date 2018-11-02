@@ -109,6 +109,18 @@ public class GameData {
         return participants[position];
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        StringBuilder back = new StringBuilder(super.toString());
+        back.append(" {participants:[");
+        for (UserData u : participants) {
+            back.append(u.getId()).append(", ").append(u.getFirstName()).append(" ").append(u.getLastName()).append(" | ");
+        }
+        back.append("], score:[").append(scores[0]).append(", ").append(scores[1]).append("]}");
+        return back.toString();
+    }
+
     /**
      * @return <p>required array lengh = 2
      * <br>Position 0 is the score from team A, score > 0 if this team won
@@ -145,7 +157,7 @@ public class GameData {
         this.participants = participants;
     }
 
-    public void setScores(int[] scores) {
+    public void setScores(int... scores) {
         this.scores = scores;
     }
 
@@ -168,4 +180,6 @@ public class GameData {
     public void setGameId(int gameId) {
         this.gameId = gameId;
     }
+
+
 }

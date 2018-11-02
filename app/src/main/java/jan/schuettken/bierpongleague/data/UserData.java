@@ -1,5 +1,8 @@
 package jan.schuettken.bierpongleague.data;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 
 /**
@@ -7,11 +10,19 @@ import java.io.Serializable;
  */
 public class UserData implements Serializable {
     private int id;
+    private double elo;
     private String username, firstName, lastName, nickName, password, email;
 
     //TODO es fehlen noch einige Infos - UserData sollte den gesamten Datenbank Eintrag abbilden
 
     public UserData() {
+    }
+
+    public UserData(JSONObject userData) throws JSONException {
+        setId(userData.getInt("id"));
+        setFirstName(userData.getString("FirstName"));
+        setLastName(userData.getString("LastName"));
+        setElo(userData.getDouble("Elo"));
     }
 
     public int getId() {
@@ -68,5 +79,13 @@ public class UserData implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public double getElo() {
+        return elo;
+    }
+
+    public void setElo(double elo) {
+        this.elo = elo;
     }
 }

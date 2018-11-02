@@ -35,6 +35,12 @@
     <string name="to_short">Zu kurz</string>
     <string name="player">Spieler</string>
     <string name="score">Score</string>
-    <string name="hit_cups">Getroffene Becher</string>
+    <string name="add_game">Spiel hinzufügen</string>
+    <string name="score_description">Die Anzahl an Bechern, welche noch vor dem jeweiligen Team stehen</string>
+    <string name="button_ok">OK</string>
+    <string name="button_cancel">Abbrechen</string>
+    <string name="button_yes">Ja</string>
+    <string name="button_no">Nein</string>
+    <string name="game_added">Spiel eingetragen</string>
 
 </resources>

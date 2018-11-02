@@ -56,13 +56,6 @@ public class LoginActivity extends BasicPage implements LoaderCallbacks<Cursor> 
     private static final int REQUEST_REGISTER = 1;
 
     /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-    /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
@@ -104,8 +97,6 @@ public class LoginActivity extends BasicPage implements LoaderCallbacks<Cursor> 
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-        mUsernameView.setText("janschuettken");
-        mPasswordView.setText("Smili3000!");
     }
 
     private void populateAutoComplete() {
@@ -229,12 +220,10 @@ public class LoginActivity extends BasicPage implements LoaderCallbacks<Cursor> 
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
         return email.length() >= 3;
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() >= 8;
     }
 

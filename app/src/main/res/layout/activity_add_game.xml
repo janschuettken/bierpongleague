@@ -5,147 +5,183 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activities.AddGameActivity"
-    android:padding="5dp">
+    android:padding="5dp"
+    tools:context=".activities.AddGameActivity">
 
-    <LinearLayout
-        android:id="@+id/region_tem_a"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:background="@drawable/border_team_a"
-        android:orientation="vertical"
-        android:padding="15dp">
+        android:layout_height="match_parent">
 
-        <android.support.design.widget.TextInputLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/editText_player_a"
+            <LinearLayout
+                android:id="@+id/region_tem_a"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:ems="10"
-                android:hint="@string/player"
-                android:inputType="textPersonName" />
-        </android.support.design.widget.TextInputLayout>
+                android:layout_margin="5dp"
+                android:background="@drawable/border_team_a"
+                android:orientation="vertical"
+                android:padding="15dp">
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-            <EditText
-                android:id="@+id/editText_player_b"
+                    <AutoCompleteTextView
+                        android:id="@+id/editText_player_a"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:ems="10"
+                        android:hint="@string/player"
+                        android:inputType="textPersonName" />
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/editText_player_b"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:ems="10"
+                        android:hint="@string/player"
+                        android:inputType="textPersonName" />
+                </android.support.design.widget.TextInputLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/editText_score_team_a_out"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_centerHorizontal="true">
+
+                        <EditText
+                            android:id="@+id/editText_score_team_a"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_alignParentTop="true"
+                            android:ems="10"
+                            android:hint="@string/score"
+                            android:inputType="numberSigned"
+                            android:textColor="@color/colorTeamA"
+                            tools:ignore="Autofill" />
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="10dp"
+                        android:layout_toEndOf="@+id/editText_score_team_a_out"
+                        android:background="@drawable/ic_info_black_24dp"
+                        android:backgroundTint="@android:color/darker_gray"
+                        android:onClick="showScoreHint" />
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/region_tem_b"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:ems="10"
-                android:hint="@string/player"
-                android:inputType="textPersonName" />
-        </android.support.design.widget.TextInputLayout>
+                android:layout_margin="5dp"
+                android:background="@drawable/border_team_b"
+                android:orientation="vertical"
+                android:padding="15dp">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_centerHorizontal="true">
+                    <AutoCompleteTextView
+                        android:id="@+id/editText_player_c"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:ems="10"
+                        android:hint="@string/player"
+                        android:inputType="textPersonName" />
+                </android.support.design.widget.TextInputLayout>
 
-                <EditText
-                    android:id="@+id/editText_score_team_a"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:ems="10"
-                    android:hint="@string/hit_cups"
-                    android:textColor="@color/colorTeamA"
-                    android:inputType="numberSigned"
-                    tools:ignore="Autofill" />
-            </android.support.design.widget.TextInputLayout>
-        </RelativeLayout>
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-    </LinearLayout>
+                    <AutoCompleteTextView
+                        android:id="@+id/editText_player_d"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:ems="10"
+                        android:hint="@string/player"
+                        android:inputType="textPersonName" />
+                </android.support.design.widget.TextInputLayout>
 
-    <LinearLayout
-        android:id="@+id/region_tem_b"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:background="@drawable/border_team_b"
-        android:orientation="vertical"
-        android:padding="15dp">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/editText_score_team_b_out"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:layout_centerHorizontal="true">
 
-            <EditText
-                android:id="@+id/editText_player_c"
+                        <EditText
+                            android:id="@+id/editText_score_team_b"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_alignParentTop="true"
+                            android:ems="10"
+                            android:hint="@string/score"
+                            android:inputType="numberSigned"
+                            android:textColor="@color/colorTeamB"
+                            tools:ignore="Autofill" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="10dp"
+                        android:layout_toEndOf="@+id/editText_score_team_b_out"
+                        android:background="@drawable/ic_info_black_24dp"
+                        android:backgroundTint="@android:color/darker_gray"
+                        android:onClick="showScoreHint" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/username_register_button"
+                style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:ems="10"
-                android:hint="@string/player"
-                android:inputType="textPersonName" />
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/editText_player_d"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:ems="10"
-                android:hint="@string/player"
-                android:inputType="textPersonName" />
-        </android.support.design.widget.TextInputLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_centerHorizontal="true">
-
-                <EditText
-                    android:id="@+id/editText_score_team_B"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:ems="10"
-                    android:textColor="@color/colorTeamB"
-                    android:hint="@string/hit_cups"
-                    android:inputType="numberSigned"
-                    tools:ignore="Autofill" />
-            </android.support.design.widget.TextInputLayout>
-        </RelativeLayout>
-    </LinearLayout>
-    <Button
-        android:id="@+id/username_register_button"
-        style="?android:textAppearanceSmall"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/round_button_white"
-        android:text="@string/action_register"
-        android:textColor="@color/colorAccent"
-        android:textStyle="bold"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
-        android:onClick="addGame"/>
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="30dp"
+                android:background="@drawable/round_button_white"
+                android:onClick="addGame"
+                android:text="@string/add_game"
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>
