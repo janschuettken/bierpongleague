@@ -199,9 +199,10 @@ public class ApiHandler {
     @NonNull
     public List<GameData> getGames(@IntRange(from = 0) int userId)
             throws SessionErrorException, NoConnectionException, RuntimeException, JSONException {
-        String fileUrl = SERVER_URL + "updateConfirm.php?session=" + session;
-        fileUrl += "?userId=" + userId;
+        String fileUrl = SERVER_URL + "getGame.php?session=" + session;
+        fileUrl += "&userId=" + userId;
         String response = serverHandler.getJsonFromServer(fileUrl);
+
         if (response.equalsIgnoreCase("#fail#session error"))
             throw new SessionErrorException(response);
         if (response.startsWith("#fail#"))
@@ -215,6 +216,7 @@ public class ApiHandler {
         int lastGameId = -1, lastScore = -1;
         int gameId, score;//set to 1 for Weiderhold
         GameData currentGame = null;
+        boolean firstRun = true;
         for (int i = 0; i < gameObjects.length(); i++) {
             JSONObject c = gameObjects.getJSONObject(i);
 
@@ -222,27 +224,39 @@ public class ApiHandler {
             gameId = c.getInt("GameId");
             //reset the playerCounter, if the a new game starts
             if (gameId != lastGameId) {
-                if (currentGame != null)//only add "filled" games
+                if (currentGame != null) {//only add "filled" games
                     games.add(currentGame);
+                }
                 playerCounter = teamCounter = 0;//reset all counter
                 currentGame = new GameData();//create a new game - all variables are set to not null - arrays are initialized
+                firstRun = true;
             }
 
             assert currentGame != null;//a game cant be null at this point
             currentGame.setGameId(gameId);//will be overwritten 4 times (if no guest takes place)
             currentGame.getParticipant(playerCounter).setId(c.getInt("Id"));
-            currentGame.getScores()[teamCounter] = score = c.getInt("Score");//save the score to check if the team changes (only with a guest possible)
+            score = c.getInt("Score");
+            if (currentGame.getScores()[teamCounter] == -1) {
+
+                currentGame.getScores()[teamCounter] = score;//save the score to check if the team changes (only with a guest possible)
+            }
             currentGame.getParticipant(playerCounter).setFirstName(c.getString("FirstName"));
             currentGame.getParticipant(playerCounter).setLastName(c.getString("LastName"));
             currentGame.setConfirmed(c.getInt("Confirmed") == 1);
             currentGame.setDescription(c.getString("Confirmed"));
 
             //update counter vars
-            playerCounter++;
-            if (lastScore != score)
+            if (score != lastScore && !firstRun) {
                 teamCounter++;
+                if (teamCounter == 2)
+                    teamCounter = 0;
+            }
+
+            playerCounter++;
             lastGameId = gameId;
             lastScore = score;
+            firstRun = false;
+
 
         }
 

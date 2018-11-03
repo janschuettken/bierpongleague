@@ -90,7 +90,7 @@ public class GameData {
             participants[i] = new UserData();
         scores = new int[2];
         for (int i = 0; i < scores.length; i++)
-            scores[i] = 0;
+            scores[i] = -1;
         areaId = 1;
         description = null;
     }

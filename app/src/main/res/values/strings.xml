@@ -42,5 +42,7 @@
     <string name="button_yes">Ja</string>
     <string name="button_no">Nein</string>
     <string name="game_added">Spiel eingetragen</string>
+    <string name="overview">Übersicht</string>
+    <string name="score_spacer">:</string>
 
 </resources>

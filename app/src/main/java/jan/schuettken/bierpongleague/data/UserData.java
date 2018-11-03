@@ -88,4 +88,8 @@ public class UserData implements Serializable {
     public void setElo(double elo) {
         this.elo = elo;
     }
+
+    public String getFullName() {
+        return getFirstName() + " " + getLastName();
+    }
 }
