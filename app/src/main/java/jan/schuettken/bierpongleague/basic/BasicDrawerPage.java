@@ -1,20 +1,40 @@
 package jan.schuettken.bierpongleague.basic;
 
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+
+import org.json.JSONException;
 
 import jan.schuettken.bierpongleague.R;
+import jan.schuettken.bierpongleague.activities.ConfirmActivity;
+import jan.schuettken.bierpongleague.activities.EloTrendActivity;
+import jan.schuettken.bierpongleague.activities.LoginActivity;
 import jan.schuettken.bierpongleague.activities.OverviewActivity;
 import jan.schuettken.bierpongleague.activities.PlayedGamesActivity;
+import jan.schuettken.bierpongleague.data.UserData;
+import jan.schuettken.bierpongleague.exceptions.DatabaseException;
+import jan.schuettken.bierpongleague.exceptions.EmptyPreferencesException;
+import jan.schuettken.bierpongleague.exceptions.InvalidLoginException;
+import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
+import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
+import jan.schuettken.bierpongleague.handler.ApiHandler;
+import jan.schuettken.bierpongleague.handler.PreferencesHandler;
 
 /**
  * Created by Jan Schüttken on 03.11.2018 at 11:50
  */
 public abstract class BasicDrawerPage extends BasicPage implements NavigationView.OnNavigationItemSelectedListener {
+
+    public final static String CURRENT_USER = "CURRENT_USER";
+    private UserData currentUser = null;
+
     @Override
     public void setContentView(int contentView) {
         super.setContentView(contentView);
@@ -29,7 +49,51 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //pass the current user, so it must not be read from the internet all time
+        currentUser = (UserData) getObjectParameter(CURRENT_USER);
+        if (currentUser == null) {
+            ApiHandler apiHandler = createApiHandler();
+            try {
+                currentUser = apiHandler.getYourself();
+            } catch (NoConnectionException | SessionErrorException | JSONException e) {
+                e.printStackTrace();
+                switchView(LoginActivity.class, true);
+                return;
+            }
+        }
+
+        //fill Header with information
+        View head = navigationView.getHeaderView(navigationView.getHeaderCount() - 1);
+        TextView welcome = head.findViewById(R.id.text_name);
+        welcome.setText(getResString(R.string.hello_user, currentUser.getFullName()));
+        TextView elo = head.findViewById(R.id.text_elo);
+        elo.setText(getResString(R.string.your_elo, (int) currentUser.getElo()));
+
         selectPage();
+    }
+
+    protected ApiHandler createApiHandler() {
+        PreferencesHandler preferencesHandler = new PreferencesHandler(this);
+        ApiHandler apiHandler;
+        try {
+            //get Session if available
+            apiHandler = new ApiHandler(preferencesHandler.getSessionId());
+            return apiHandler;
+        } catch (EmptyPreferencesException e) {
+            try {
+                apiHandler = new ApiHandler(preferencesHandler.getUsername(), preferencesHandler.getPassword());
+                return apiHandler;
+            } catch (NoConnectionException | DatabaseException e1) {
+                //TODO Try again Later
+                switchView(LoginActivity.class, true);
+                return null;
+            } catch (InvalidLoginException | EmptyPreferencesException e1) {
+                //You shouldn't be logged in
+                switchView(LoginActivity.class, true);
+                return null;
+            }
+        }
     }
 
     @Override
@@ -43,18 +107,27 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
         switch (item.getItemId()) {
             case R.id.nav_overview:
                 if (!(this instanceof OverviewActivity)) {
-                    switchView(OverviewActivity.class, true);
+                    switchView(OverviewActivity.class, true, new Portable(CURRENT_USER, currentUser));
                 }
                 break;
             case R.id.nav_played_games:
                 if (!(this instanceof PlayedGamesActivity)) {
-                    switchView(PlayedGamesActivity.class, true);
+                    switchView(PlayedGamesActivity.class, true, new Portable(CURRENT_USER, currentUser));
+                }
+                break;
+            case R.id.nav_to_confirm:
+                if (!(this instanceof ConfirmActivity)) {
+                    switchView(ConfirmActivity.class, true, new Portable(CURRENT_USER, currentUser));
+                }
+                break;
+            case R.id.nav_elo_trend:
+                if (!(this instanceof EloTrendActivity)) {
+                    switchView(EloTrendActivity.class, true, new Portable(CURRENT_USER, currentUser));
                 }
                 break;
             case R.id.nav_share:
@@ -63,7 +136,7 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
                 break;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -76,7 +149,7 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
     /**
      * sets the right menu option as selected (displayed in blue)
      *
-     * @param id
+     * @param id the R.id.xxx for from the nav
      */
     protected void selectPage(int id) {
         ((NavigationView) findViewById(R.id.nav_view)).getMenu().findItem(id).setChecked(true);

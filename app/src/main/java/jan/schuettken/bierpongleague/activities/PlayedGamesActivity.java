@@ -9,19 +9,16 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import org.json.JSONException;
 
 import java.util.List;
+import java.util.Objects;
 
 import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.basic.BasicDrawerPage;
 import jan.schuettken.bierpongleague.custom.GameRecyclerListAdapter;
 import jan.schuettken.bierpongleague.custom.SimpleItemTouchHelperCallback;
 import jan.schuettken.bierpongleague.data.GameData;
-import jan.schuettken.bierpongleague.exceptions.DatabaseException;
-import jan.schuettken.bierpongleague.exceptions.EmptyPreferencesException;
-import jan.schuettken.bierpongleague.exceptions.InvalidLoginException;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
 import jan.schuettken.bierpongleague.handler.ApiHandler;
-import jan.schuettken.bierpongleague.handler.PreferencesHandler;
 
 public class PlayedGamesActivity extends BasicDrawerPage {
 
@@ -34,6 +31,7 @@ public class PlayedGamesActivity extends BasicDrawerPage {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_played_games);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.played_games);
         handler = new Handler();
 
         initializeList();
@@ -70,36 +68,19 @@ public class PlayedGamesActivity extends BasicDrawerPage {
         selectPage(R.id.nav_played_games);
     }
 
-    private boolean createApiHandler() {
-        PreferencesHandler preferencesHandler = new PreferencesHandler(this);
-        try {
-            //get Session if available
-            apiHandler = new ApiHandler(preferencesHandler.getSessionId());
-            return true;
-        } catch (EmptyPreferencesException e) {
-            try {
-                apiHandler = new ApiHandler(preferencesHandler.getUsername(), preferencesHandler.getPassword());
-                return true;
-            } catch (NoConnectionException | DatabaseException e1) {
-                //TODO Try again Later
-                switchView(LoginActivity.class, true);
-                return false;
-            } catch (InvalidLoginException | EmptyPreferencesException e1) {
-                //You shouldn't be logged in
-                switchView(LoginActivity.class, true);
-                return false;
-            }
-        }
+    private boolean checkApiHandler() {
+        apiHandler = createApiHandler();
+        return apiHandler != null;
     }
 
     private void loadGames() {
         new Thread() {
             @Override
             public void run() {
-                if (!createApiHandler())
+                if (!checkApiHandler())
                     return;
                 try {
-                    final List<GameData> games = apiHandler.getGames(apiHandler.getYourself());
+                    final List<GameData> games = apiHandler.getGames(apiHandler.getYourself(), true);
                     handler.post(new Runnable() {
                         @Override
                         public void run() {

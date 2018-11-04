@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -214,9 +215,66 @@ public class LoginActivity extends BasicPage implements LoaderCallbacks<Cursor> 
 //            prefHandler.setUsername(username);
 //            prefHandler.setPassword(password);
             showProgress(true);
-            mAuthTask = new UserLoginTask(username, password);
-            mAuthTask.execute((Void) null);
+            login(username, password);
+//            mAuthTask = new UserLoginTask(username, password);
+//            mAuthTask.execute((Void) null);
         }
+    }
+
+    private void login(final String username, final String password) {
+// TODO: attempt authentication against a network service.
+        final Handler handler = new Handler();
+
+        new Thread() {
+            @Override
+            public void run() {
+                boolean success = false;
+                ApiHandler apiHandler = null;
+                try {
+                    // Simulate network access.
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    success = false;
+                }
+                try {
+
+                    apiHandler = new ApiHandler(username, password);
+
+                    //automatically logged in
+                    success = true;
+                } catch (InvalidLoginException e) {
+                    //TODO error
+                    Log.e("LOGIN", "fail");
+                    success = false;
+                } catch (NoConnectionException | DatabaseException e) {
+                    //TODO no connection
+                    Log.e("LOGIN", "fail");
+                    success = false;
+                }
+
+
+                final boolean finalSuccess = success;
+                final ApiHandler finalApiHandler = apiHandler;
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        showProgress(false);
+                        Log.e("LOGIN", "result:" + finalSuccess);
+                        if (finalSuccess) {
+                            PreferencesHandler preferencesHandler = new PreferencesHandler(LoginActivity.this);
+                            preferencesHandler.setSessionId(finalApiHandler.getSession());
+                            preferencesHandler.setUsername(username);
+                            preferencesHandler.setPassword(password);
+                            switchView(OverviewActivity.class, true);
+                        } else {
+                            mPasswordView.setError(getString(R.string.error_incorrect_password));
+                            mPasswordView.requestFocus();
+                        }
+                    }
+                });
+            }
+        }.start();
+
     }
 
     private boolean isEmailValid(String email) {
@@ -328,19 +386,16 @@ public class LoginActivity extends BasicPage implements LoaderCallbacks<Cursor> 
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
-            Log.e("LOGIN", "start");
             try {
                 // Simulate network access.
                 Thread.sleep(200);
             } catch (InterruptedException e) {
                 return false;
             }
-            Log.e("LOGIN", "step 1");
             try {
                 apiHandler = new ApiHandler(mUsername, mPassword);
 
                 //automatically logged in
-                Log.e("LOGIN", "done");
                 return true;
             } catch (InvalidLoginException e) {
                 //TODO error

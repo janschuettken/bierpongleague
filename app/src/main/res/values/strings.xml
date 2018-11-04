@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BierpongLeague</string>
+    <string name="app_name"><b>BIERPONG</b><i>league</i></string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -43,6 +43,11 @@
     <string name="button_no">Nein</string>
     <string name="game_added">Spiel eingetragen</string>
     <string name="overview">Übersicht</string>
-    <string name="score_spacer">:</string>
+    <string name="score_spacer"> </string>
+    <string name="to_confirm">Bestätigungen</string>
+    <string name="elo_trend">Elo Verlauf</string>
+    <string name="hello_user">Hallo %1$s</string>
+    <string name="your_elo">Deine Elo: %1$d</string>
+    <string name="zero">0</string>
 
 </resources>

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/row_category_background"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -13,24 +15,26 @@
         android:layout_centerInParent="true" />
 
     <RelativeLayout
+        android:id="@+id/color_region_a"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignEnd="@id/center"
         android:layout_alignBottom="@+id/region_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginEnd="3dp"
-        android:background="@drawable/border_team_a" />
+        android:layout_marginEnd="7dp"
+        android:background="@drawable/color_team_a_gradient" />
 
     <RelativeLayout
+        android:id="@+id/color_region_b"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@id/center"
         android:layout_alignBottom="@+id/region_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="3dp"
-        android:background="@drawable/border_team_b" />
+        android:layout_marginStart="7dp"
+        android:background="@drawable/color_team_b_gradient" />
 
     <RelativeLayout
         android:id="@+id/region_content"
@@ -47,21 +51,37 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/name_player_a"
+                android:id="@+id/name_player_a_first_name"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:text="@string/player"
-                android:textColor="@android:color/black"
+                android:textColor="@android:color/white"
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/name_player_b"
+                android:id="@+id/name_player_a_last_name"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:layout_marginBottom="20dp"
                 android:text="@string/player"
-                android:textColor="@android:color/black"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/name_player_b_first_name"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="@string/player"
+                android:textColor="@android:color/white"
                 android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/name_player_b_last_name"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="@string/player"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -73,55 +93,101 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/name_player_c"
+                android:id="@+id/name_player_c_first_name"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:text="@string/player"
                 android:textAlignment="textEnd"
-                android:textColor="@android:color/black"
+                android:textColor="@android:color/white"
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/name_player_d"
+                android:id="@+id/name_player_c_last_name"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:layout_marginBottom="20dp"
                 android:text="@string/player"
                 android:textAlignment="textEnd"
-                android:textColor="@android:color/black"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/name_player_d_first_name"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="@string/player"
+                android:textAlignment="textEnd"
+                android:textColor="@android:color/white"
                 android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/name_player_d_last_name"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:text="@string/player"
+                android:textAlignment="textEnd"
+                android:textColor="@android:color/white"
+                android:textSize="14sp" />
+
+
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:orientation="horizontal">
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true">
+
+            <ImageView
+                android:id="@+id/imageView_crone_team_a"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                app:srcCompat="@drawable/ic_crown"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/text_score_team_a"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/player"
-                android:textColor="@android:color/black"
-                android:textSize="20sp" />
+                android:layout_below="@+id/imageView_crone_team_a"
+                android:layout_marginStart="3dp"
+                android:text="@string/zero"
+                android:textColor="@android:color/white"
+                android:textSize="30sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="@string/score_spacer"
-                android:textColor="@android:color/black"
-                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/text_score_team_b"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/player"
-                android:textColor="@android:color/black"
-                android:textSize="20sp" />
-        </LinearLayout>
+                android:layout_below="@+id/imageView_crone_team_b"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="3dp"
+                android:text="@string/zero"
+                android:textColor="@android:color/white"
+                android:textSize="30sp" />
+
+            <ImageView
+                android:id="@+id/imageView_crone_team_b"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                app:srcCompat="@drawable/ic_crown"
+                tools:ignore="ContentDescription" />
+
+
+        </RelativeLayout>
+
     </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/region_content"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/settings_border" />
+
 </RelativeLayout>

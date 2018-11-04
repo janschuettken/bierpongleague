@@ -1,11 +1,13 @@
 package jan.schuettken.bierpongleague.custom;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.Collections;
@@ -77,30 +79,60 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
 
         GameData i = items.get(position);
         TextView player;
-        player = vi.findViewById(R.id.name_player_a);
-        player.setText(i.getParticipant(0).getFullName());
+        player = vi.findViewById(R.id.name_player_a_first_name);
+        player.setText(i.getParticipant(0).getFirstName());
+        player = vi.findViewById(R.id.name_player_a_last_name);
+        player.setText(i.getParticipant(0).getLastName());
 
-        player = vi.findViewById(R.id.name_player_b);
-        player.setText(i.getParticipant(1).getFullName());
+        player = vi.findViewById(R.id.name_player_b_first_name);
+        player.setText(i.getParticipant(1).getFirstName());
+        player = vi.findViewById(R.id.name_player_b_last_name);
+        player.setText(i.getParticipant(1).getLastName());
 
-        player = vi.findViewById(R.id.name_player_c);
-        player.setText(i.getParticipant(2).getFullName());
+        player = vi.findViewById(R.id.name_player_c_first_name);
+        player.setText(i.getParticipant(2).getFirstName());
+        player = vi.findViewById(R.id.name_player_c_last_name);
+        player.setText(i.getParticipant(2).getLastName());
 
-        player = vi.findViewById(R.id.name_player_d);
-        player.setText(i.getParticipant(3).getFullName());
+        player = vi.findViewById(R.id.name_player_d_first_name);
+        player.setText(i.getParticipant(3).getFirstName());
+        player = vi.findViewById(R.id.name_player_d_last_name);
+        player.setText(i.getParticipant(3).getLastName());
 
         player = vi.findViewById(R.id.text_score_team_a);
-        player.setText(i.getScores()[0]+"");
+        player.setText(i.getScores()[0] + "");
 
         player = vi.findViewById(R.id.text_score_team_b);
-        player.setText(i.getScores()[1]+"");
+        player.setText(i.getScores()[1] + "");
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                action.action(position);
-            }
-        });
+        if (i.getScores()[0] < i.getScores()[1]) {//the blue/green team is always the winner
+            RelativeLayout rl = vi.findViewById(R.id.color_region_a);
+            Drawable d = context.getDrawable(R.drawable.color_team_b_gradient);
+            rl.setBackground(d);
+
+            rl = vi.findViewById(R.id.color_region_b);
+            d = context.getDrawable(R.drawable.color_team_a_gradient);
+            rl.setBackground(d);
+            vi.findViewById(R.id.imageView_crone_team_a).setVisibility(View.INVISIBLE);
+            vi.findViewById(R.id.imageView_crone_team_b).setVisibility(View.VISIBLE);
+        } else {
+            RelativeLayout rl = vi.findViewById(R.id.color_region_a);
+            Drawable d = context.getDrawable(R.drawable.color_team_a_gradient);
+            rl.setBackground(d);
+
+            rl = vi.findViewById(R.id.color_region_b);
+            d = context.getDrawable(R.drawable.color_team_b_gradient);
+            rl.setBackground(d);
+            vi.findViewById(R.id.imageView_crone_team_a).setVisibility(View.VISIBLE);
+            vi.findViewById(R.id.imageView_crone_team_b).setVisibility(View.INVISIBLE);
+        }
+
+//        holder.itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                action.action(position);
+//            }
+//        });
     }
 
     @Override

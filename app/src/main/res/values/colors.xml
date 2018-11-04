@@ -3,6 +3,8 @@
     <color name="colorPrimary">#00579e</color>
     <color name="colorPrimaryDark">#001957</color>
     <color name="colorAccent">#d8b21b</color>
-    <color name="colorTeamA">#1bd8af</color>
-    <color name="colorTeamB">#d51bd8</color>
+    <color name="colorTeamA">#39b54a</color>
+    <color name="colorTeamADark">#007245</color>
+    <color name="colorTeamB">#c1272d</color>
+    <color name="colorTeamBDark">#7e0000</color>
 </resources>

@@ -19,7 +19,7 @@ public class UserData implements Serializable {
     }
 
     public UserData(JSONObject userData) throws JSONException {
-        setId(userData.getInt("id"));
+        setId(userData.getInt("Id"));
         setFirstName(userData.getString("FirstName"));
         setLastName(userData.getString("LastName"));
         setElo(userData.getDouble("Elo"));

@@ -109,6 +109,19 @@ public class GameData {
         return participants[position];
     }
 
+    public void swopTeams() {
+        int tmpScore = scores[0];
+        scores[0] = scores[1];
+        scores[1] = tmpScore;
+        UserData tmpUser = participants[0];
+        participants[0] = participants[2];
+        participants[2] = tmpUser;
+        tmpUser = participants[1];
+        participants[1] = participants[3];
+        participants[3] = tmpUser;
+    }
+
+
     @NonNull
     @Override
     public String toString() {

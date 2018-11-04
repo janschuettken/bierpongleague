@@ -176,20 +176,22 @@ public class ApiHandler {
     }
 
     /**
-     * @param user the user
+     * @param user            the user
+     * @param youAreInTeamOne <p>if true, the logged in user is always in the first team (ordered by userId)<br>if false, the winning team will be in the first team (ordered by userId)</p>
      * @return a list of all Games from the user with userId
      * @throws SessionErrorException session is not set or outdated
      * @throws NoConnectionException Connection Timeout
      * @throws JSONException         the file is bad - might be an server problem
      * @throws RuntimeException      in here the server response is stored
      */
-    public List<GameData> getGames(@NonNull UserData user)
+    public List<GameData> getGames(@NonNull UserData user, boolean youAreInTeamOne)
             throws NoConnectionException, SessionErrorException, RuntimeException, JSONException {
-        return getGames(user.getId());
+        return getGames(user.getId(), youAreInTeamOne);
     }
 
     /**
-     * @param userId the id for the user
+     * @param userId          the id for the user
+     * @param youAreInTeamOne <p>if true, the logged in user is always in the first team (ordered by userId)<br>if false, the winning team will be in the first team (ordered by userId)</p>
      * @return a list of all Games from the user with userId
      * @throws SessionErrorException session is not set or outdated
      * @throws NoConnectionException Connection Timeout
@@ -197,7 +199,7 @@ public class ApiHandler {
      * @throws RuntimeException      in here the server response is stored
      */
     @NonNull
-    public List<GameData> getGames(@IntRange(from = 0) int userId)
+    public List<GameData> getGames(@IntRange(from = 0) int userId, boolean youAreInTeamOne)
             throws SessionErrorException, NoConnectionException, RuntimeException, JSONException {
         String fileUrl = SERVER_URL + "getGame.php?session=" + session;
         fileUrl += "&userId=" + userId;
@@ -225,6 +227,14 @@ public class ApiHandler {
             //reset the playerCounter, if the a new game starts
             if (gameId != lastGameId) {
                 if (currentGame != null) {//only add "filled" games
+                    if (youAreInTeamOne) {
+                        for (int n = 0; n < currentGame.getParticipants().length; n++) {
+                            if (currentGame.getParticipant(n).getId() == userId && n > 1) {
+                                currentGame.swopTeams();
+                                break;
+                            }
+                        }
+                    }
                     games.add(currentGame);
                 }
                 playerCounter = teamCounter = 0;//reset all counter

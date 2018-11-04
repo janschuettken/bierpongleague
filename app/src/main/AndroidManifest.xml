@@ -44,6 +44,12 @@
         <activity
             android:name=".activities.PlayedGamesActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.ConfirmActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.EloTrendActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
