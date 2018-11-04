@@ -43,6 +43,7 @@ public class PlayedGamesActivity extends BasicDrawerPage {
         templateList.setLayoutManager(new LinearLayoutManager(this));
 
         recyclerList = new GameRecyclerListAdapter(this);
+        recyclerList.setCurrentUser(currentUser);
         //Enable reordering the list
         SimpleItemTouchHelperCallback callback = new SimpleItemTouchHelperCallback(recyclerList);
         callback.setLongPressDragEnabled(false);

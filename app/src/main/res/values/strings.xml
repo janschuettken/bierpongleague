@@ -49,5 +49,8 @@
     <string name="hello_user">Hallo %1$s</string>
     <string name="your_elo">Deine Elo: %1$d</string>
     <string name="zero">0</string>
+    <string name="confirm_right">Stimmt</string>
+    <string name="confirm_wrong">Lüge</string>
+    <string name="game_confirmed">Spiel bestätigt</string>
 
 </resources>

@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.StartActivity"
-    android:background="@color/colorPrimary">
+    android:background="@color/colorPrimary"
+    tools:context=".activities.StartActivity">
 
     <RelativeLayout
 
@@ -12,6 +12,12 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         tools:ignore="UselessParent">
+
+        <ImageView
+            android:layout_width="400dp"
+            android:layout_height="400dp"
+            android:layout_centerInParent="true"
+            android:background="@mipmap/ic_launcher_foreground" />
 
         <TextView
             android:id="@+id/textView_beerpong"
@@ -22,7 +28,8 @@
             android:textAllCaps="true"
             android:textColor="@color/colorAccent"
             android:textSize="40sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/textView_league"
@@ -35,18 +42,19 @@
             android:textAllCaps="false"
             android:textColor="@color/colorAccent"
             android:textSize="36sp"
-            android:textStyle="italic" />
+            android:textStyle="italic"
+            android:visibility="gone" />
     </RelativeLayout>
 
     <ImageButton
         android:id="@+id/retry_connect_to_server"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:backgroundTint="@color/colorAccent"
-        android:background="@drawable/ic_refresh_black_24dp"
-        android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginBottom="50dp"
-        android:visibility="invisible"
-        android:onClick="retryConnectToServer"/>
+        android:background="@drawable/ic_refresh_black_24dp"
+        android:backgroundTint="@color/colorAccent"
+        android:onClick="retryConnectToServer"
+        android:visibility="invisible" />
 </RelativeLayout>

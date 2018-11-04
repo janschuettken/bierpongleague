@@ -41,6 +41,7 @@ public class GameData {
      * True: all participants have confirmed the game, false: at least one does't confirmed
      */
     private boolean confirmed = false;
+    private int confirmedUser[] = {-1, -1, -1, -1};
 
     /**
      * @param participants <p>required array lengh = 4
@@ -166,6 +167,19 @@ public class GameData {
         return confirmed;
     }
 
+    /**
+     * Default is false
+     *
+     * @param userId the User id
+     * @return True: the participants has confirmed the game, false: he has not
+     */
+    public boolean hasConfirmed(int userId) {
+        for (int i : confirmedUser)
+            if (i == userId)
+                return true;
+        return false;
+    }
+
     public void setParticipants(UserData[] participants) {
         this.participants = participants;
     }
@@ -182,8 +196,16 @@ public class GameData {
         this.description = description;
     }
 
+    public void addConfirmed(boolean confirmed) {
+        this.confirmed &= confirmed;
+    }
+
     public void setConfirmed(boolean confirmed) {
         this.confirmed = confirmed;
+    }
+
+    public void setConfirmed(int playerPos, int userId) {
+        confirmedUser[playerPos] = userId;
     }
 
     public int getGameId() {

@@ -105,8 +105,8 @@ public class ApiHandler {
             throw new IllegalArgumentException("participants.lengh must be 4, is: " + participants.length + " and scores.lengh must be 2, is: " + scores.length);
         if (scores[0] > 0 && scores[1] > 0)
             throw new IllegalArgumentException("One team scores must be 0");
-        String fileUrl = SERVER_URL + "updateConfirm.php?session=" + session;
-        fileUrl += "?playerA=" + participants[0].getId();
+        String fileUrl = SERVER_URL + "addGame.php?session=" + session;
+        fileUrl += "&playerA=" + participants[0].getId();
         fileUrl += "&playerB=" + participants[1].getId();
         fileUrl += "&playerC=" + participants[2].getId();
         fileUrl += "&playerD=" + participants[3].getId();
@@ -116,8 +116,10 @@ public class ApiHandler {
         if (description.length > 0)
             fileUrl += "&description=" + description[0];
         String response = serverHandler.getJsonFromServer(fileUrl);
-        if (response.equalsIgnoreCase("#fail#session error"))
+        if (response.equalsIgnoreCase("#fail#session error")) {
+            Log.e("ADD_GAME", fileUrl);
             throw new SessionErrorException(response);
+        }
         if (response.startsWith("#fail#"))
             throw new RuntimeException(response);
         return true;
@@ -137,7 +139,7 @@ public class ApiHandler {
             throws SessionErrorException, NoConnectionException, RuntimeException {
 
         String fileUrl = SERVER_URL + "updateConfirm.php?session=" + session;
-        fileUrl += "&addGame=" + gameId + "&confirm=" + confirm;
+        fileUrl += "&gameId=" + gameId + "&confirm=" + (confirm ? 1 : 0);
         String response = serverHandler.getJsonFromServer(fileUrl);
         if (response.equalsIgnoreCase("#fail#session error"))
             throw new SessionErrorException(response);
@@ -221,7 +223,6 @@ public class ApiHandler {
         boolean firstRun = true;
         for (int i = 0; i < gameObjects.length(); i++) {
             JSONObject c = gameObjects.getJSONObject(i);
-
             // Storing each json item in variable
             gameId = c.getInt("GameId");
             //reset the playerCounter, if the a new game starts
@@ -252,7 +253,9 @@ public class ApiHandler {
             }
             currentGame.getParticipant(playerCounter).setFirstName(c.getString("FirstName"));
             currentGame.getParticipant(playerCounter).setLastName(c.getString("LastName"));
-            currentGame.setConfirmed(c.getInt("Confirmed") == 1);
+            currentGame.addConfirmed(c.getInt("Confirmed") == 1);
+            if (c.getInt("Confirmed") == 1)
+                currentGame.setConfirmed(playerCounter, c.getInt("Id"));
             currentGame.setDescription(c.getString("Confirmed"));
 
             //update counter vars

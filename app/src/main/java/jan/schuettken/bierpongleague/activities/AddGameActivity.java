@@ -40,7 +40,7 @@ public class AddGameActivity extends BasicPage {
         new Thread() {
             @Override
             public void run() {
-                if (!createApiHandler())
+                if (!checkApiHandler())
                     finish();
                 createAutofill();
             }
@@ -48,7 +48,7 @@ public class AddGameActivity extends BasicPage {
 
     }
 
-    private boolean createApiHandler() {
+    public boolean checkApiHandler() {
         PreferencesHandler preferencesHandler = new PreferencesHandler(this);
         try {
             //get Session if available
@@ -121,24 +121,23 @@ public class AddGameActivity extends BasicPage {
     }
 
     public void addGame(View view) {
-        if (createGame()) {
-            try {
-                if (apiHandler.addGame(game)) {
-                    showToast(R.string.game_added);
-                    finish();
-                }
-            } catch (SessionErrorException | NoConnectionException e) {
-                createApiHandler();
-                try {
-                    if (apiHandler.addGame(game)) {
-                        showToast(R.string.game_added);
-                        finish();
+        createApiHandler();
+        new Thread() {
+            @Override
+            public void run() {
+                if (createGame()) {
+                    try {
+                        if (apiHandler.addGame(game)) {
+                            showToast(R.string.game_added, handler);
+                            finish(handler);
+                        }
+                    } catch (SessionErrorException | NoConnectionException e) {
+                        e.printStackTrace();
                     }
-                } catch (NoConnectionException | SessionErrorException e1) {
-                    switchView(LoginActivity.class, true);
                 }
             }
-        }
+        }.start();
+
     }
 
     private boolean createGame() {
@@ -148,14 +147,27 @@ public class AddGameActivity extends BasicPage {
         try {
             scoreA = Integer.parseInt(et.getText().toString());
         } catch (Exception e) {
-            et.setError(getString(R.string.error_field_required));
+            final EditText finalEt = et;
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    finalEt.setError(getString(R.string.error_field_required));
+                }
+            });
             return false;
         }
         et = findViewById(R.id.editText_score_team_b);
         try {
             scoreB = Integer.parseInt(et.getText().toString());
         } catch (Exception e) {
-            et.setError(getString(R.string.error_field_required));
+            final EditText finalEt = et;
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    finalEt.setError(getString(R.string.error_field_required));
+                }
+            });
+
             return false;
         }
 

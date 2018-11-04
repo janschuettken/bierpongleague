@@ -15,6 +15,13 @@ import android.widget.Toast;
 import java.io.Serializable;
 
 import jan.schuettken.bierpongleague.R;
+import jan.schuettken.bierpongleague.activities.LoginActivity;
+import jan.schuettken.bierpongleague.exceptions.DatabaseException;
+import jan.schuettken.bierpongleague.exceptions.EmptyPreferencesException;
+import jan.schuettken.bierpongleague.exceptions.InvalidLoginException;
+import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
+import jan.schuettken.bierpongleague.handler.ApiHandler;
+import jan.schuettken.bierpongleague.handler.PreferencesHandler;
 
 /**
  * Created by Jan Schüttken on 22.08.2017 at 17:26
@@ -198,6 +205,15 @@ public class BasicPage extends AppCompatActivity implements PageInterfaceLarge {
         showToast(this.getResources().getString(id));
     }
 
+    public void showToast(final int id, Handler handler) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                showToast(BasicPage.this.getResources().getString(id));
+            }
+        });
+    }
+
     public void showToast(int id, Object... res) {
         showToast(getString(id, res));
     }
@@ -242,5 +258,37 @@ public class BasicPage extends AppCompatActivity implements PageInterfaceLarge {
         intent.putExtra(key, extra);
         setResult(code, intent);
         finish();
+    }
+
+    public void finish(Handler handler) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                finish();
+            }
+        });
+    }
+
+    public ApiHandler createApiHandler() {
+        PreferencesHandler preferencesHandler = new PreferencesHandler(this);
+        ApiHandler apiHandler;
+        try {
+            //get Session if available
+            apiHandler = new ApiHandler(preferencesHandler.getSessionId());
+            return apiHandler;
+        } catch (EmptyPreferencesException e) {
+            try {
+                apiHandler = new ApiHandler(preferencesHandler.getUsername(), preferencesHandler.getPassword());
+                return apiHandler;
+            } catch (NoConnectionException | DatabaseException e1) {
+                //TODO Try again Later
+                switchView(LoginActivity.class, true);
+                return null;
+            } catch (InvalidLoginException | EmptyPreferencesException e1) {
+                //You shouldn't be logged in
+                switchView(LoginActivity.class, true);
+                return null;
+            }
+        }
     }
 }

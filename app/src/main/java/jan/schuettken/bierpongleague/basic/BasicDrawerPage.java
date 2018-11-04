@@ -19,13 +19,9 @@ import jan.schuettken.bierpongleague.activities.LoginActivity;
 import jan.schuettken.bierpongleague.activities.OverviewActivity;
 import jan.schuettken.bierpongleague.activities.PlayedGamesActivity;
 import jan.schuettken.bierpongleague.data.UserData;
-import jan.schuettken.bierpongleague.exceptions.DatabaseException;
-import jan.schuettken.bierpongleague.exceptions.EmptyPreferencesException;
-import jan.schuettken.bierpongleague.exceptions.InvalidLoginException;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
 import jan.schuettken.bierpongleague.handler.ApiHandler;
-import jan.schuettken.bierpongleague.handler.PreferencesHandler;
 
 /**
  * Created by Jan Schüttken on 03.11.2018 at 11:50
@@ -33,7 +29,7 @@ import jan.schuettken.bierpongleague.handler.PreferencesHandler;
 public abstract class BasicDrawerPage extends BasicPage implements NavigationView.OnNavigationItemSelectedListener {
 
     public final static String CURRENT_USER = "CURRENT_USER";
-    private UserData currentUser = null;
+    protected UserData currentUser = null;
 
     @Override
     public void setContentView(int contentView) {
@@ -71,29 +67,6 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
         elo.setText(getResString(R.string.your_elo, (int) currentUser.getElo()));
 
         selectPage();
-    }
-
-    protected ApiHandler createApiHandler() {
-        PreferencesHandler preferencesHandler = new PreferencesHandler(this);
-        ApiHandler apiHandler;
-        try {
-            //get Session if available
-            apiHandler = new ApiHandler(preferencesHandler.getSessionId());
-            return apiHandler;
-        } catch (EmptyPreferencesException e) {
-            try {
-                apiHandler = new ApiHandler(preferencesHandler.getUsername(), preferencesHandler.getPassword());
-                return apiHandler;
-            } catch (NoConnectionException | DatabaseException e1) {
-                //TODO Try again Later
-                switchView(LoginActivity.class, true);
-                return null;
-            } catch (InvalidLoginException | EmptyPreferencesException e1) {
-                //You shouldn't be logged in
-                switchView(LoginActivity.class, true);
-                return null;
-            }
-        }
     }
 
     @Override
