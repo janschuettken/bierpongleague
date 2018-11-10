@@ -13,6 +13,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 
 import jan.schuettken.bierpongleague.R;
+import jan.schuettken.bierpongleague.activities.AddGameActivity;
 import jan.schuettken.bierpongleague.activities.ConfirmActivity;
 import jan.schuettken.bierpongleague.activities.EloTrendActivity;
 import jan.schuettken.bierpongleague.activities.LoginActivity;
@@ -65,6 +66,14 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
         welcome.setText(getResString(R.string.hello_user, currentUser.getFullName()));
         TextView elo = head.findViewById(R.id.text_elo);
         elo.setText(getResString(R.string.your_elo, (int) currentUser.getElo()));
+
+        //set up the add ne game FAB
+        findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switchView(AddGameActivity.class);
+            }
+        });
 
         selectPage();
     }

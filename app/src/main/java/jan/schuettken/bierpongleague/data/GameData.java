@@ -86,9 +86,14 @@ public class GameData {
      * Initialises all variables with defaults
      */
     public GameData() {
+        this(true);
+    }
+
+    public GameData(boolean initUserData) {
         participants = new UserData[4];
-        for (int i = 0; i < participants.length; i++)
-            participants[i] = new UserData();
+        if (initUserData)
+            for (int i = 0; i < participants.length; i++)
+                participants[i] = new UserData();
         scores = new int[2];
         for (int i = 0; i < scores.length; i++)
             scores[i] = -1;

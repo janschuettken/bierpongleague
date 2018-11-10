@@ -1,5 +1,6 @@
 package jan.schuettken.bierpongleague.data;
 
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,6 +17,7 @@ public class UserData implements Serializable {
     //TODO es fehlen noch einige Infos - UserData sollte den gesamten Datenbank Eintrag abbilden
 
     public UserData() {
+
     }
 
     public UserData(JSONObject userData) throws JSONException {
@@ -91,5 +93,12 @@ public class UserData implements Serializable {
 
     public String getFullName() {
         return getFirstName() + " " + getLastName();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof UserData))
+            return false;
+        return this.getFullName().equals(((UserData) obj).getFullName());
     }
 }

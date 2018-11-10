@@ -52,5 +52,6 @@
     <string name="confirm_right">Stimmt</string>
     <string name="confirm_wrong">Lüge</string>
     <string name="game_confirmed">Spiel bestätigt</string>
+    <string name="user_used">Du kannst jede Person nur einmal pro Spiel verwenden!</string>
 
 </resources>

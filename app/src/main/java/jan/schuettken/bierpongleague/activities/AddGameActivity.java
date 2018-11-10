@@ -3,6 +3,9 @@ package jan.schuettken.bierpongleague.activities;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -30,7 +33,7 @@ public class AddGameActivity extends BasicPage {
 
     private ApiHandler apiHandler;
     private Handler handler;
-    private GameData game = new GameData();
+    private GameData game = new GameData(false);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,82 @@ public class AddGameActivity extends BasicPage {
             }
         }.start();
 
+        final EditText et_a = findViewById(R.id.editText_score_team_a);
+        final EditText et_b = findViewById(R.id.editText_score_team_b);
+        et_a.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().equals("")) {
+                    try {
+                        int number = Integer.parseInt(s.toString());
+                        if (number > 0) {
+                            et_b.setText("0");
+                            et_b.setEnabled(false);
+                        } else if (number == 0) {
+                            et_b.setEnabled(true);
+                        } else {
+                            resetScoreFields(et_a, et_b);
+                        }
+                    } catch (Exception e) {
+                        resetScoreFields(et_a, et_b);
+                    }
+
+                } else {
+                    et_b.setEnabled(true);
+                }
+            }
+        });
+        et_b.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().equals("")) {
+                    try {
+                        int number = Integer.parseInt(s.toString());
+                        if (number > 0) {
+                            et_a.setText("0");
+                            et_a.setEnabled(false);
+                        } else if (number == 0) {
+                            et_a.setEnabled(true);
+                        } else {
+                            resetScoreFields(et_a, et_b);
+                        }
+                    } catch (Exception e) {
+                        resetScoreFields(et_a, et_b);
+                    }
+
+                } else {
+                    et_a.setEnabled(true);
+                }
+            }
+        });
+
+    }
+
+    private void resetScoreFields(EditText et_a, EditText et_b) {
+        et_b.setText("");
+        et_b.setEnabled(true);
+        et_a.setText("");
+        et_a.setEnabled(true);
     }
 
     public boolean checkApiHandler() {
@@ -112,12 +191,35 @@ public class AddGameActivity extends BasicPage {
                         break;
                     }
                 }
-                if (posInList > -1)
+                if (posInList > -1) {
                     game.getParticipants()[player] = autofillUser.get(posInList);
-                else
+                    if (checkUserForDuplicate(player)) {
+                        game.getParticipants()[player] = null;
+                        textView.setText("");
+                        textView.setError(getString(R.string.user_used));
+                    }
+                } else
                     throw new RuntimeException("User not in list - Internal Error");
+
+
             }
         });
+    }
+
+    private boolean checkUserForDuplicate(int lastChange) {
+        for (int i = 0; i < game.getParticipants().length; i++) {
+            for (int n = 0; n < game.getParticipants().length; n++) {
+                if (i == n)
+                    continue;
+                if (game.getParticipant(i) == null || game.getParticipant(n) == null)
+                    continue;
+                if (game.getParticipant(i).equals(game.getParticipant(n))) {
+                    Log.e("CHECK", i + ":" + n + " - " + game.getParticipant(i).getFullName() + ":" + game.getParticipant(n).getFullName());
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void addGame(View view) {
@@ -142,6 +244,7 @@ public class AddGameActivity extends BasicPage {
 
     private boolean createGame() {
         //TODO jeder user darf nut einmal auftauceh und alle felder müssen ausgefüllt sein
+
         int scoreA, scoreB;
         EditText et = findViewById(R.id.editText_score_team_a);
         try {

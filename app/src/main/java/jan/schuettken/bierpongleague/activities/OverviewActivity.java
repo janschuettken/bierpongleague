@@ -14,12 +14,7 @@ public class OverviewActivity extends BasicDrawerPage {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_overview);
-        findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                switchView(AddGameActivity.class);
-            }
-        });
+
 
     }
 
