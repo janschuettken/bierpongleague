@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:contentDescription="@string/nav_header_desc"
         android:layout_marginStart="-12dp"
-        app:srcCompat="@mipmap/ic_launcher_foreground" />
+        app:srcCompat="@drawable/ic_logo_v3_2" />
 
     <TextView
         android:id="@+id/text_name"

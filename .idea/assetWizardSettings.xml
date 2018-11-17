@@ -114,8 +114,11 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_crowne" />
-                            <entry key="sourceFile" value="C:\Users\JanSc\Desktop\862729.svg" />
+                            <entry key="height" value="500" />
+                            <entry key="outputName" value="ic_logo_v3_2_text" />
+                            <entry key="overrideSize" value="true" />
+                            <entry key="sourceFile" value="D:\OneDrive\Dokumente\Projekte\Bierpong League\Images\Logo_v3_2_text.svg" />
+                            <entry key="width" value="500" />
                           </map>
                         </option>
                       </PersistentState>
