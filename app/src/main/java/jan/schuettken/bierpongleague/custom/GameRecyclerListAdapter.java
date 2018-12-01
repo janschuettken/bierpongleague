@@ -16,7 +16,7 @@ import java.util.LinkedList;
 
 import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.activities.LoginActivity;
-import jan.schuettken.bierpongleague.basic.BasicPage;
+import jan.schuettken.bierpongleague.activities.PlayedGamesActivity;
 import jan.schuettken.bierpongleague.data.GameData;
 import jan.schuettken.bierpongleague.data.UserData;
 import jan.schuettken.bierpongleague.exceptions.DatabaseException;
@@ -35,13 +35,13 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
 
     private LinkedList<GameData> items = new LinkedList<>();
     private ListAction action;
-    private BasicPage context;
+    private PlayedGamesActivity context;
     private View view;
     private ApiHandler apiHandler;
     private UserData currentUser;
 
 
-    public GameRecyclerListAdapter(BasicPage context) {
+    public GameRecyclerListAdapter(PlayedGamesActivity context) {
         this.context = context;
         this.apiHandler = context.createApiHandler();
     }
@@ -172,15 +172,19 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
             return;
         }
         try {
-            if (apiHandler.confirmGame(gameId, confirm))
+            if (apiHandler.confirmGame(gameId, confirm)){
                 context.showToast(R.string.game_confirmed);
+                context.loadGames();
+            }
         } catch (SessionErrorException | NoConnectionException e) {
             e.printStackTrace();
             PreferencesHandler prefHandler = new PreferencesHandler(context);
             try {
                 apiHandler = new ApiHandler(prefHandler.getUsername(), prefHandler.getPassword());
-                if (apiHandler.confirmGame(gameId, confirm))
+                if (apiHandler.confirmGame(gameId, confirm)){
                     context.showToast(R.string.game_confirmed);
+                    context.loadGames();
+                }
             } catch (SessionErrorException | InvalidLoginException | NoConnectionException | DatabaseException | EmptyPreferencesException e1) {
                 e1.printStackTrace();
                 context.switchView(LoginActivity.class, true);

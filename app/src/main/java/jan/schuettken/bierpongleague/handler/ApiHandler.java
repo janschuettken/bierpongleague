@@ -190,7 +190,6 @@ public class ApiHandler {
         if (response.startsWith("#fail#"))
             throw new RuntimeException(response);
 
-
         return response.equalsIgnoreCase("#success#");
     }
 

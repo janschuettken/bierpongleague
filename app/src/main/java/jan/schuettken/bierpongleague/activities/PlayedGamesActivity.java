@@ -74,7 +74,7 @@ public class PlayedGamesActivity extends BasicDrawerPage {
         return apiHandler != null;
     }
 
-    private void loadGames() {
+    public void loadGames() {
         new Thread() {
             @Override
             public void run() {
@@ -85,6 +85,7 @@ public class PlayedGamesActivity extends BasicDrawerPage {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
+                            recyclerList.getItems().clear();
                             recyclerList.getItems().addAll(games);
                             templateList.setAdapter(recyclerList);
                         }
