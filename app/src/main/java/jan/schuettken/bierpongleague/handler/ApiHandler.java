@@ -17,6 +17,7 @@ import jan.schuettken.bierpongleague.exceptions.DatabaseException;
 import jan.schuettken.bierpongleague.exceptions.InvalidLoginException;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
+import jan.schuettken.bierpongleague.exceptions.UsernameTakenException;
 
 /**
  * Created by Jan Schüttken on 30.10.2018 at 21:23
@@ -172,9 +173,25 @@ public class ApiHandler {
     }
 
 
-    public boolean register(UserData user) {
-        //TODO  Methode erstellen
-        return false;
+    public boolean register(@NonNull UserData user) throws NoConnectionException, UsernameTakenException {
+        String fileUrl = SERVER_URL + "addUser.php";
+        fileUrl += "?username=" + user.getUsername();
+        fileUrl += "&password=" + user.getPassword();
+        fileUrl += "&email=" + user.getEmail();
+        fileUrl += "&firstName=" + user.getFirstName();
+        fileUrl += "&lastName=" + user.getLastName();
+        fileUrl += "&nickName=" + user.getNickName();
+        fileUrl += "&gender=" + user.getGender();
+        //Log.e("REGISTER", fileUrl);
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        //Log.e("REGISTER", response);
+        if (response.equalsIgnoreCase("#fail#user exists already"))
+            throw new UsernameTakenException(response);
+        if (response.startsWith("#fail#"))
+            throw new RuntimeException(response);
+
+
+        return response.equalsIgnoreCase("#success#");
     }
 
     /**

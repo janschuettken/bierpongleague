@@ -53,5 +53,9 @@
     <string name="confirm_wrong">Lüge</string>
     <string name="game_confirmed">Spiel bestätigt</string>
     <string name="user_used">Du kannst jede Person nur einmal pro Spiel verwenden!</string>
-
+    <string name="username_taken">Benutzername bereits benutzt</string>
+    <array name="gender">
+        <item>Mit Pimmel</item>
+        <item>Mit ohne Pimmel</item>
+    </array>
 </resources>

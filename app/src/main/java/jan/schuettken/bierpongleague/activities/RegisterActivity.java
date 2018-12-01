@@ -3,11 +3,14 @@ package jan.schuettken.bierpongleague.activities;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.basic.BasicPage;
 import jan.schuettken.bierpongleague.basic.Portable;
 import jan.schuettken.bierpongleague.data.UserData;
+import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
+import jan.schuettken.bierpongleague.exceptions.UsernameTakenException;
 import jan.schuettken.bierpongleague.handler.ApiHandler;
 
 public class RegisterActivity extends BasicPage {
@@ -24,8 +27,13 @@ public class RegisterActivity extends BasicPage {
     public void register(View view) {
         if (checkFields()) {
             ApiHandler apiHandler = new ApiHandler();
-            apiHandler.register(user);
-            //TODO erros abfangen!
+            try {
+                apiHandler.register(user);
+            } catch (NoConnectionException e) {
+                //TODO Try again Later
+            } catch (UsernameTakenException e) {
+                ((EditText) findViewById(R.id.username)).setError(getString(R.string.username_taken));
+            }
             finishWithResult(RESULT_OK, new Portable("user", user));
         }
     }
@@ -39,6 +47,7 @@ public class RegisterActivity extends BasicPage {
         user.setUsername(checkPartField(R.id.username, 3, check));
         user.setEmail(checkPartField(R.id.mail, 5, check));
         user.setPassword(checkPartField(R.id.password, 2, check));
+        user.setGender(((Spinner) findViewById(R.id.spinner_gender)).getSelectedItemPosition());
 
         return check.check;
     }

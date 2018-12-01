@@ -13,6 +13,9 @@ public class UserData implements Serializable {
     private int id;
     private double elo;
     private String username, firstName, lastName, nickName, password, email;
+    private int gender;
+    public final static int GENDER_WITH_PENIS = 0;
+    public final static int GENDER_WITHOUT_PENIS = 1;
 
     //TODO es fehlen noch einige Infos - UserData sollte den gesamten Datenbank Eintrag abbilden
 
@@ -93,6 +96,14 @@ public class UserData implements Serializable {
 
     public String getFullName() {
         return getFirstName() + " " + getLastName();
+    }
+
+    public int getGender() {
+        return gender;
+    }
+
+    public void setGender(int gender) {
+        this.gender = gender;
     }
 
     @Override
