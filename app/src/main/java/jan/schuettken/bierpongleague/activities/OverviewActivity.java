@@ -1,22 +1,47 @@
 package jan.schuettken.bierpongleague.activities;
 
+import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.SpannableString;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.TextView;
+
+import com.github.mikephil.charting.animation.Easing;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.interfaces.datasets.IDataSet;
+import com.github.mikephil.charting.utils.MPPointF;
+
+import org.json.JSONException;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.basic.BasicDrawerPage;
+import jan.schuettken.bierpongleague.custom.MyOnChartValueSelectedListener;
+import jan.schuettken.bierpongleague.data.GameData;
+import jan.schuettken.bierpongleague.data.UserData;
+import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
+import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
+import jan.schuettken.bierpongleague.handler.ApiHandler;
+import jan.schuettken.bierpongleague.handler.ColorFunctionProvider;
 
 public class OverviewActivity extends BasicDrawerPage {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_overview);
-
-
-    }
+    private Handler handler;
+    private ApiHandler apiHandler;
+    private PieChart pieChartWinLose;
+    private MyOnChartValueSelectedListener pieChartWinLoseClick;
 
     @Override
     protected void selectPage() {
@@ -43,5 +68,260 @@ public class OverviewActivity extends BasicDrawerPage {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_overview);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.played_games);
+        initializeHandler();
+//        initializeStats();
+        initPieChartOut();
+        try {
+            refreshCharts();
+        } catch (SessionErrorException | JSONException | NoConnectionException e) {
+            e.printStackTrace();
+        }
+        try {
+            initializeElo();
+        } catch (SessionErrorException | JSONException | NoConnectionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initializeHandler() {
+        handler = new Handler();
+        checkApiHandler();
+    }
+
+    private boolean checkApiHandler() {
+        apiHandler = createApiHandler();
+        return apiHandler != null;
+    }
+
+    private void initializeStats() {
+        final TextView played = findViewById(R.id.num_played_games),
+                won = findViewById(R.id.num_won_games),
+                lost = findViewById(R.id.num_lost_games);
+        new Thread() {
+            @Override
+            public void run() {
+                if (!checkApiHandler())
+                    return;
+                try {
+                    final List<GameData> games = apiHandler.getGames(apiHandler.getYourself(), true);
+                    final int[] stats = getBasicGameStats(games);
+                    handler.post(new Runnable() {
+                        @SuppressLint("SetTextI18n")
+                        @Override
+                        public void run() {
+                            played.setText(stats[0] + "");
+                            won.setText(stats[1] + "");
+                            lost.setText(stats[2] + "");
+                        }
+                    });
+
+                } catch (NoConnectionException | SessionErrorException | JSONException e) {
+                    //should not happen
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
+
+    /**
+     * calculates the played/won/lost Games
+     *
+     * @param games the list of all played Games
+     * @return int[played, won, lost]
+     */
+    private int[] getBasicGameStats(List<GameData> games) {
+        int[] stats = {0, 0, 0};
+        for (GameData game : games) {
+            stats[0]++;
+            if (game.getScores()[0] < game.getScores()[1])
+                stats[2]++;
+            else
+                stats[1]++;
+        }
+        return stats;
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void initializeElo() throws SessionErrorException, JSONException, NoConnectionException {
+        UserData you = apiHandler.getYourself();
+        TextView nameField = findViewById(R.id.name_field);
+        nameField.setText(you.getFirstName() + " " + you.getLastName());
+        TextView eloField = findViewById(R.id.your_elo_text);
+        eloField.setText(0 + "");
+        slowlyIncreaseElo(2400.0, you.getElo(), eloField);
+    }
+
+    private void slowlyIncreaseElo(double ms, double elo, final TextView eloField) {
+        final double wait = 10.0, steps;
+        steps = ms / wait;//should be an int otherwise is the shown elo not exactly precise
+
+        final double increase = elo / steps;
+        new Thread() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void run() {
+                for (int i = 0; i <= steps; i++) {
+                    try {
+                        Thread.sleep((long) wait);
+                    } catch (InterruptedException ignored) {
+                    }
+                    eloField.setText(((int) (increase * i)) + "");
+                }
+
+            }
+        }.start();
+    }
+
+    private void initPieChartOut() {
+        pieChartWinLose = findViewById(R.id.pie_chart_category_out);
+        pieChartWinLose.setUsePercentValues(true);
+        pieChartWinLose.getDescription().setEnabled(false);
+        pieChartWinLose.setExtraOffsets(5, 10, 5, 5);
+
+        pieChartWinLose.setDragDecelerationFrictionCoef(0.95f);
+
+//        pieChartWinLose.setCenterTextTypeface(mTfLight);
+        pieChartWinLose.setCenterText(generateCenterSpannableText());
+
+        pieChartWinLose.setDrawHoleEnabled(true);
+        pieChartWinLose.setHoleColor(Color.WHITE);
+
+        pieChartWinLose.setTransparentCircleColor(Color.WHITE);
+        pieChartWinLose.setTransparentCircleAlpha(110);
+
+        pieChartWinLose.setHoleRadius(58f);
+        pieChartWinLose.setTransparentCircleRadius(61f);
+
+        pieChartWinLose.setDrawCenterText(true);
+
+        pieChartWinLose.setRotationAngle(0);
+        // enable rotation of the chart by touch
+        pieChartWinLose.setRotationEnabled(true);
+        pieChartWinLose.setHighlightPerTapEnabled(true);
+
+        // pieChartWinLose.setUnit(" €");
+        // pieChartWinLose.setDrawUnitsInChart(true);
+
+        // add a selection listener
+        pieChartWinLoseClick = new MyOnChartValueSelectedListener(pieChartWinLose, getResString(R.string.win_ratio), getResString(R.string.games_all_time));
+        pieChartWinLose.setOnChartValueSelectedListener(pieChartWinLoseClick);
+
+        pieChartWinLose.animateY(1400, Easing.EasingOption.EaseInOutQuad);
+        // pieChartWinLose.spin(2000, 0, 360);
+
+        Legend l = pieChartWinLose.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        l.setWordWrapEnabled(true);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setXEntrySpace(7f);
+        l.setYEntrySpace(0f);
+        l.setYOffset(0f);
+        l.setEnabled(false);
+
+        // entry label styling
+        pieChartWinLose.setEntryLabelColor(Color.WHITE);
+//        pieChartWinLose.setEntryLabelTypeface(mTfRegular);
+        pieChartWinLose.setEntryLabelTextSize(12f);
+    }
+
+    private void refreshCharts() throws SessionErrorException, JSONException, NoConnectionException {
+        List<GameData> items = apiHandler.getGames(apiHandler.getYourself(), true);
+
+        if (items == null) return;
+        setItemDataCategoryChart(items);
+        pieChartWinLoseClick.onNothingSelected();
+        pieChartWinLose.invalidate();
+        pieChartWinLose.animateX(2500);
+
+    }
+
+    private void setItemDataCategoryChart(List<GameData> games) {
+        if (games == null || games.isEmpty())
+            return;
+        List<Double> WinLoseRatio = new ArrayList<>();
+        WinLoseRatio.add(0.0);//Wins
+        WinLoseRatio.add(0.0);//Loses
+
+        int allTimePlayed = 0;
+        for (GameData i : games) {
+
+            if (i.getScores()[0] > 0) {
+                WinLoseRatio.set(0, WinLoseRatio.get(0) + 1);
+            } else {
+                WinLoseRatio.set(1, WinLoseRatio.get(1) + 1);
+            }
+            allTimePlayed++;
+
+        }
+        pieChartWinLoseClick.setAllTime(allTimePlayed);
+        float percent;
+        if (WinLoseRatio.get(1) > 0)
+            percent = (float) (WinLoseRatio.get(0) / WinLoseRatio.get(1));
+        else
+            percent = WinLoseRatio.get(0).floatValue();
+
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+
+        pieChartWinLoseClick.setPercent(getResString(R.string.win_ratio) + ": " + decimalFormat.format(percent));
+        ArrayList<Integer> colorsOut = new ArrayList<>();
+        ArrayList<PieEntry> entriesOut = new ArrayList<>();
+
+        String textWin = "Gewonnen", textLose = "Verloren";
+
+        for (int n = 0; n < 2; n++) {
+
+            int colorARGB;
+            if (n == 0) {
+                PieEntry pe = new PieEntry(WinLoseRatio.get(n).floatValue(), textWin);
+                entriesOut.add(pe);
+                colorARGB = ColorFunctionProvider.setColor(0, 1, 0);
+            } else {
+                PieEntry pe = new PieEntry(WinLoseRatio.get(n).floatValue(), textLose);
+                entriesOut.add(pe);
+                colorARGB = ColorFunctionProvider.setColor(1, 0, 0);
+            }
+
+            colorARGB = ColorFunctionProvider.setAlphaToNull(colorARGB);
+            colorsOut.add(colorARGB);
+        }
+        pieChartWinLoseClick.setEntries(entriesOut);
+        PieDataSet dataSetOut = new PieDataSet(entriesOut, "");
+
+        dataSetOut.setDrawIcons(false);
+        dataSetOut.setSliceSpace(3f);
+        dataSetOut.setIconsOffset(new MPPointF(0, 40));
+        dataSetOut.setSelectionShift(5f);
+
+        dataSetOut.setColors(colorsOut);
+        //dataSetOut.setSelectionShift(0f);
+
+        PieData dataOut = new PieData(dataSetOut);
+        dataOut.setValueFormatter(new PercentFormatter());
+        dataOut.setValueTextSize(13f);
+        dataOut.setValueTextColor(Color.DKGRAY);
+        pieChartWinLose.setEntryLabelColor(Color.BLACK);
+        pieChartWinLose.setDrawingCacheBackgroundColor(Color.BLACK);
+        pieChartWinLose.setNoDataTextColor(Color.BLACK);
+//        dataOut.setValueTypeface(mTfLight);
+        pieChartWinLose.setCenterText(MyOnChartValueSelectedListener.generateCenterSpannableText(getString(R.string.games_all_time) + "\n" + allTimePlayed));
+        pieChartWinLose.setData(dataOut);
+        // undo all highlights
+        pieChartWinLose.highlightValues(null);
+
+        for (IDataSet<?> set : pieChartWinLose.getData().getDataSets())
+            set.setDrawValues(false);
+    }
+
+    private SpannableString generateCenterSpannableText() {
+        return MyOnChartValueSelectedListener.generateCenterSpannableText("");
     }
 }

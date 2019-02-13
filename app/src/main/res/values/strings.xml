@@ -58,4 +58,11 @@
         <item>Mit Pimmel</item>
         <item>Mit ohne Pimmel</item>
     </array>
+    <string name="won_games">Gewonnene Spiele</string>
+    <string name="lost_games">Verlorene Spiele</string>
+    <string name="statistics">Statistiken</string>
+    <string name="games_all_time">Spiele jemals</string>
+    <string name="win_lose_ratio">Sieg/Niederlage Verhältnis</string>
+    <string name="win_ratio">Sieg Quote</string>
+    <string name="your_elo_clean">Deine Elo</string>
 </resources>
