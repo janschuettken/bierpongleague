@@ -2,6 +2,7 @@ package jan.schuettken.bierpongleague.activities;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -24,6 +25,7 @@ public class PlayedGamesActivity extends BasicDrawerPage {
 
     private Handler handler;
     private GameRecyclerListAdapter recyclerList;
+    private SwipeRefreshLayout swipeContainer;
     private RecyclerView templateList;
     private ApiHandler apiHandler;
 
@@ -33,8 +35,21 @@ public class PlayedGamesActivity extends BasicDrawerPage {
         setContentView(R.layout.activity_played_games);
         Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.played_games);
         handler = new Handler();
-
+        initializeRefreshListener();
         initializeList();
+    }
+
+    private void initializeRefreshListener(){
+        swipeContainer = findViewById(R.id.swipeContainer);
+
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadGames();
+                //swipeContainer.setRefreshing(false);
+            }
+        });
     }
 
     private void initializeList() {
@@ -75,6 +90,7 @@ public class PlayedGamesActivity extends BasicDrawerPage {
     }
 
     public void loadGames() {
+        swipeContainer.setRefreshing(true);
         new Thread() {
             @Override
             public void run() {
@@ -88,6 +104,7 @@ public class PlayedGamesActivity extends BasicDrawerPage {
                             recyclerList.getItems().clear();
                             recyclerList.getItems().addAll(games);
                             templateList.setAdapter(recyclerList);
+                            swipeContainer.setRefreshing(false);
                         }
                     });
 

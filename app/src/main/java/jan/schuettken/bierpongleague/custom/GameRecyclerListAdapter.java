@@ -1,6 +1,10 @@
 package jan.schuettken.bierpongleague.custom;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -90,6 +94,7 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
         return new ItemViewHolder(v);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, final int position) {
 
@@ -166,30 +171,87 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
         }
     }
 
-    private void confirmGame(int gameId, boolean confirm) {
-        if (apiHandler == null) {
-            Log.e("CONFIRM", "apiHandler == null");
-            return;
-        }
-        try {
-            if (apiHandler.confirmGame(gameId, confirm)){
+    private void confirmGame(final int gameId, final boolean confirm) {
+        showProgress(true);
+        final Handler handler = new Handler();
+        final PreferencesHandler prefHandler = new PreferencesHandler(context);
+
+        new Thread() {
+            @Override
+            public void run() {
+
+                try {//TODO test case
+                    Thread.sleep(200);
+                } catch (InterruptedException ignored) {
+                }
+                if (apiHandler == null) {
+                    Log.e("CONFIRM", "apiHandler == null");
+                    return;
+                }
+                try {
+                    if (apiHandler.confirmGame(gameId, confirm)) {
+                        showConfirmInfoAndReload(handler);
+                    }
+                } catch (SessionErrorException | NoConnectionException e) {
+                    e.printStackTrace();
+                    try {
+                        apiHandler = new ApiHandler(prefHandler.getUsername(), prefHandler.getPassword());
+                        if (apiHandler.confirmGame(gameId, confirm)) {
+                            showConfirmInfoAndReload(handler);
+                        }
+                    } catch (SessionErrorException | InvalidLoginException | NoConnectionException | DatabaseException | EmptyPreferencesException e1) {
+                        e1.printStackTrace();
+                        showProgress(false, handler);
+                        context.switchView(LoginActivity.class, true, handler);
+                    }
+                }
+
+            }
+        }.start();
+
+    }
+
+    private void showConfirmInfoAndReload(Handler handler) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
                 context.showToast(R.string.game_confirmed);
+                showProgress(false);
                 context.loadGames();
             }
-        } catch (SessionErrorException | NoConnectionException e) {
-            e.printStackTrace();
-            PreferencesHandler prefHandler = new PreferencesHandler(context);
-            try {
-                apiHandler = new ApiHandler(prefHandler.getUsername(), prefHandler.getPassword());
-                if (apiHandler.confirmGame(gameId, confirm)){
-                    context.showToast(R.string.game_confirmed);
-                    context.loadGames();
-                }
-            } catch (SessionErrorException | InvalidLoginException | NoConnectionException | DatabaseException | EmptyPreferencesException e1) {
-                e1.printStackTrace();
-                context.switchView(LoginActivity.class, true);
+        });
+    }
+
+    private void showProgress(final boolean show, Handler handler) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                showProgress(show);
             }
+        });
+    }
+
+    private void showProgress(final boolean show) {
+        try {
+            showProgress(show, context.findViewById(R.id.progress_confirm_region), context.findViewById(R.id.progress_confirm_bg));
+        } catch (NullPointerException ignored) {
         }
+    }
+
+    private void showProgress(final boolean show, final View foreground, final View background) {
+
+        int shortAnimTime = context.getResources().getInteger(android.R.integer.config_shortAnimTime);
+        int longAnimTime = context.getResources().getInteger(android.R.integer.config_longAnimTime);
+
+//        enableEditing(!show);
+        foreground.setVisibility(show ? View.VISIBLE : View.GONE);
+        background.animate().setDuration(longAnimTime).alpha(
+                show ? 0.5f : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                foreground.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     @Override
