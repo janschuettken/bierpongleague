@@ -7,11 +7,24 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="5dp">
+    <RelativeLayout
+        android:id="@+id/region_game_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="5dp">
+        <TextView
+            android:id="@+id/text_game_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/error_incorrect_password"/>
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/region_game_row"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/region_game_info">
 
         <RelativeLayout
             android:id="@+id/center"

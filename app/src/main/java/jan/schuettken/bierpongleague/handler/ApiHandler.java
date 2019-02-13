@@ -261,6 +261,7 @@ public class ApiHandler {
 
             assert currentGame != null;//a game cant be null at this point
             currentGame.setGameId(gameId);//will be overwritten 4 times (if no guest takes place)
+            currentGame.setDate(c.getString("Date"));//will be overwritten 4 times (if no guest takes place)
             currentGame.getParticipant(playerCounter).setId(c.getInt("Id"));
             score = c.getInt("Score");
             if (currentGame.getScores()[teamCounter] == -1) {

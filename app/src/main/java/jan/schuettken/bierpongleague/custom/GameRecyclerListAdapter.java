@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.LinkedList;
 
@@ -102,7 +103,15 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
 
 
         final GameData game = items.get(position);
-        TextView player;
+        TextView player, date;
+        date = vi.findViewById(R.id.text_game_date);
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+        if (game.getDate() != null)
+            date.setText(format.format(game.getDate()));
+        else
+            date.setText("Date Error");
+
         player = vi.findViewById(R.id.name_player_a_first_name);
         player.setText(game.getParticipant(0).getFirstName());
         player = vi.findViewById(R.id.name_player_a_last_name);

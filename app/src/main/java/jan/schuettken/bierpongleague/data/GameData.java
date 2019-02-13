@@ -1,7 +1,13 @@
 package jan.schuettken.bierpongleague.data;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by Jan Schüttken on 30.10.2018 at 22:37
@@ -42,6 +48,11 @@ public class GameData {
      */
     private boolean confirmed = false;
     private int confirmedUser[] = {-1, -1, -1, -1};
+
+    /**
+     * The Timestamp when the game was created
+     */
+    private Date date = null;
 
     /**
      * @param participants <p>required array lengh = 4
@@ -221,5 +232,23 @@ public class GameData {
         this.gameId = gameId;
     }
 
+    @Nullable
+    public Date getDate() {
+        return date;
+    }
 
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public void setDate(String date) {
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            this.date = format.parse ( date);
+        } catch (ParseException e) {
+            this.date = null;
+            e.printStackTrace();
+        }
+    }
 }
