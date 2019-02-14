@@ -24,7 +24,6 @@ import org.json.JSONException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.basic.BasicDrawerPage;
@@ -74,7 +73,7 @@ public class OverviewActivity extends BasicDrawerPage {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_overview);
-        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.played_games);
+//        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.played_games);
         initializeHandler();
 //        initializeStats();
         initPieChartOut();
