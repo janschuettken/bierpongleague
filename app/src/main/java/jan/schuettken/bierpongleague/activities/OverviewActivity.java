@@ -77,11 +77,7 @@ public class OverviewActivity extends BasicDrawerPage {
         initializeHandler();
 //        initializeStats();
         initPieChartOut();
-        try {
-            refreshCharts();
-        } catch (SessionErrorException | JSONException | NoConnectionException e) {
-            e.printStackTrace();
-        }
+        refreshCharts();
         try {
             initializeElo();
         } catch (SessionErrorException | JSONException | NoConnectionException e) {
@@ -171,7 +167,14 @@ public class OverviewActivity extends BasicDrawerPage {
                         Thread.sleep((long) wait);
                     } catch (InterruptedException ignored) {
                     }
-                    eloField.setText(((int) (increase * i)) + "");
+                    final int finalI = i;
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            eloField.setText(((int) (increase * finalI)) + "");
+                        }
+                    });
+
                 }
 
             }
@@ -232,15 +235,27 @@ public class OverviewActivity extends BasicDrawerPage {
         pieChartWinLose.setEntryLabelTextSize(12f);
     }
 
-    private void refreshCharts() throws SessionErrorException, JSONException, NoConnectionException {
-        List<GameData> items = apiHandler.getGames(apiHandler.getYourself(), true);
-
-        if (items == null) return;
-        setItemDataCategoryChart(items);
-        pieChartWinLoseClick.onNothingSelected();
-        pieChartWinLose.invalidate();
-        pieChartWinLose.animateX(2500);
-
+    private void refreshCharts() {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    final List<GameData> items = apiHandler.getGames(apiHandler.getYourself(), true);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (items != null) {
+                                setItemDataCategoryChart(items);
+                                pieChartWinLoseClick.onNothingSelected();
+                                pieChartWinLose.invalidate();
+                                pieChartWinLose.animateX(2500);
+                            }
+                        }
+                    });
+                } catch (NoConnectionException | SessionErrorException | JSONException e) {
+                }
+            }
+        }.start();
     }
 
     private void setItemDataCategoryChart(List<GameData> games) {

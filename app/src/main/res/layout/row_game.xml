@@ -33,7 +33,7 @@
             android:layout_centerInParent="true" />
 
         <RelativeLayout
-            android:id="@+id/color_region_a"
+            android:id="@+id/color_region_player"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignEnd="@id/center"
@@ -69,7 +69,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/name_player_a_first_name"
+                    android:id="@+id/name_player_first_name"
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
                     android:text="@string/player"
@@ -77,7 +77,7 @@
                     android:textSize="20sp" />
 
                 <TextView
-                    android:id="@+id/name_player_a_last_name"
+                    android:id="@+id/name_player_last_name"
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"
@@ -157,7 +157,7 @@
                 android:layout_centerVertical="true">
 
                 <ImageView
-                    android:id="@+id/imageView_crone_team_a"
+                    android:id="@+id/imageView_crone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
@@ -169,7 +169,7 @@
                     android:id="@+id/text_score_team_a"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/imageView_crone_team_a"
+                    android:layout_below="@+id/imageView_crone"
                     android:layout_marginStart="3dp"
                     android:text="@string/zero"
                     android:textColor="@android:color/white"

@@ -112,9 +112,9 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
         else
             date.setText("Date Error");
 
-        player = vi.findViewById(R.id.name_player_a_first_name);
+        player = vi.findViewById(R.id.name_player_first_name);
         player.setText(game.getParticipant(0).getFirstName());
-        player = vi.findViewById(R.id.name_player_a_last_name);
+        player = vi.findViewById(R.id.name_player_last_name);
         player.setText(game.getParticipant(0).getLastName());
 
         player = vi.findViewById(R.id.name_player_b_first_name);
@@ -139,24 +139,24 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
         player.setText(game.getScores()[1] + "");
 
         if (game.getScores()[0] < game.getScores()[1]) {//the blue/green team is always the winner
-            RelativeLayout rl = vi.findViewById(R.id.color_region_a);
+            RelativeLayout rl = vi.findViewById(R.id.color_region_player);
             Drawable d = context.getDrawable(R.drawable.color_team_b_gradient);
             rl.setBackground(d);
 
             rl = vi.findViewById(R.id.color_region_b);
             d = context.getDrawable(R.drawable.color_team_a_gradient);
             rl.setBackground(d);
-            vi.findViewById(R.id.imageView_crone_team_a).setVisibility(View.INVISIBLE);
+            vi.findViewById(R.id.imageView_crone).setVisibility(View.INVISIBLE);
             vi.findViewById(R.id.imageView_crone_team_b).setVisibility(View.VISIBLE);
         } else {
-            RelativeLayout rl = vi.findViewById(R.id.color_region_a);
+            RelativeLayout rl = vi.findViewById(R.id.color_region_player);
             Drawable d = context.getDrawable(R.drawable.color_team_a_gradient);
             rl.setBackground(d);
 
             rl = vi.findViewById(R.id.color_region_b);
             d = context.getDrawable(R.drawable.color_team_b_gradient);
             rl.setBackground(d);
-            vi.findViewById(R.id.imageView_crone_team_a).setVisibility(View.VISIBLE);
+            vi.findViewById(R.id.imageView_crone).setVisibility(View.VISIBLE);
             vi.findViewById(R.id.imageView_crone_team_b).setVisibility(View.INVISIBLE);
         }
         if (currentUser == null || game.hasConfirmed(currentUser.getId()))

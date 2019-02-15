@@ -65,4 +65,5 @@
     <string name="win_lose_ratio">Sieg/Niederlage Verhältnis</string>
     <string name="win_ratio">Sieg Quote</string>
     <string name="your_elo_clean">Deine Elo</string>
+    <string name="scoreboard">Scoreboard</string>
 </resources>

@@ -173,6 +173,13 @@ public class ApiHandler {
     }
 
 
+    /**
+     * Registers a new User to the Game. Username and Email must be unique
+     * @param user the Userdata
+     * @return true if a new user has been created
+     * @throws NoConnectionException Connection Timeout
+     * @throws UsernameTakenException The filled in Username or Email are already taken
+     */
     public boolean register(@NonNull UserData user) throws NoConnectionException, UsernameTakenException {
         String fileUrl = SERVER_URL + "addUser.php";
         fileUrl += "?username=" + user.getUsername();
@@ -318,6 +325,34 @@ public class ApiHandler {
         }
         return user;
     }
+
+    /**
+     * @return All User from the database
+     * @throws SessionErrorException session is not set or outdated
+     * @throws NoConnectionException Connection Timeout
+     * @throws JSONException         the file is bad - might be an server problem
+     * @throws RuntimeException      in here the server response is stored
+     */
+    public List<UserData> getScoreboard() throws JSONException, SessionErrorException, RuntimeException, NoConnectionException {
+        String fileUrl = SERVER_URL + "getScoreboard.php?session=" + session;
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response.equalsIgnoreCase("#fail#session error"))
+            throw new SessionErrorException(response);
+        if (response.startsWith("#fail#"))
+            throw new RuntimeException(response);
+
+        JSONArray gameObjects = new JSONArray(response);
+
+        ArrayList<UserData> user = new ArrayList<>();
+
+        for (int i = 0; i < gameObjects.length(); i++) {
+            JSONObject c = gameObjects.getJSONObject(i);
+            user.add(new UserData(c));
+        }
+        return user;
+    }
+
+
 
     /**
      * @return this will get a UserData of the current logged in User

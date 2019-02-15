@@ -50,6 +50,9 @@
         <activity
             android:name=".activities.EloTrendActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.ScoreboardActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

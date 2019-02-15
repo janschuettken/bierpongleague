@@ -19,6 +19,7 @@ import jan.schuettken.bierpongleague.activities.EloTrendActivity;
 import jan.schuettken.bierpongleague.activities.LoginActivity;
 import jan.schuettken.bierpongleague.activities.OverviewActivity;
 import jan.schuettken.bierpongleague.activities.PlayedGamesActivity;
+import jan.schuettken.bierpongleague.activities.ScoreboardActivity;
 import jan.schuettken.bierpongleague.data.UserData;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
@@ -110,6 +111,11 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
             case R.id.nav_elo_trend:
                 if (!(this instanceof EloTrendActivity)) {
                     switchView(EloTrendActivity.class, true, new Portable(CURRENT_USER, currentUser));
+                }
+                break;
+            case R.id.nav_scoreboard:
+                if (!(this instanceof ScoreboardActivity)) {
+                    switchView(ScoreboardActivity.class, true, new Portable(CURRENT_USER, currentUser));
                 }
                 break;
             case R.id.nav_share:
