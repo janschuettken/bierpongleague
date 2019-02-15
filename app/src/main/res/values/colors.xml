@@ -3,14 +3,16 @@
     <color name="colorPrimary">#00579e</color>
     <color name="colorPrimaryDark">#001957</color>
     <color name="colorAccent">#d8b21b</color>
-    <color name="colorTeamA">#39b54a</color>
-    <color name="colorTeamADark">#007245</color>
-    <color name="colorTeamB">#c1272d</color>
-    <color name="colorTeamBDark">#7e0000</color>
+    <color name="colorGreen">#39b54a</color>
+    <color name="colorGreenDark">#007245</color>
+    <color name="colorRed">#c1272d</color>
+    <color name="colorRedDark">#7e0000</color>
     <color name="colorGold">#ffd700</color>
     <color name="colorGoldDark">#8e7800</color>
     <color name="colorSilver">#c0c0c0</color>
     <color name="colorSilverDark">#747474</color>
     <color name="colorBronze">#cd7f32</color>
     <color name="colorBronzeDark">#875320</color>
+    <color name="colorBlue">#00579e</color>
+    <color name="colorBlueDark">#001957</color>
 </resources>

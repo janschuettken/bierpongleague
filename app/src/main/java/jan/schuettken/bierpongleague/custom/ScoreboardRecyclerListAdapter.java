@@ -124,10 +124,10 @@ public class ScoreboardRecyclerListAdapter extends RecyclerView.Adapter<ItemView
             Drawable d = context.getDrawable(R.drawable.color_bronze_gradient);
             rl.setBackground(d);
         }else if (position < 10) {
-            Drawable d = context.getDrawable(R.drawable.color_team_a_gradient);
+            Drawable d = context.getDrawable(R.drawable.color_green_gradient);
             rl.setBackground(d);
         } else if (user.getElo()<0){
-            Drawable d = context.getDrawable(R.drawable.color_team_b_gradient);
+            Drawable d = context.getDrawable(R.drawable.color_red_gradient);
             rl.setBackground(d);
         }else{
             Drawable d = context.getDrawable(R.drawable.color_prime_gradient);

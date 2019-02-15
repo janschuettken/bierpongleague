@@ -1,20 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activities.OverviewActivity"
-    tools:showIn="@layout/activity_overview">
+    tools:context=".activities.EloTrendActivity">
+    <!--tools:showIn="@layout/activity_elo_trend">-->
 
-    <TextView
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/elo_trend_line_chart"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_below="@id/region_text_info"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
+
+    <RelativeLayout
+        android:id="@+id/region_text_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Elo!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:padding="5dp">
 
-</android.support.constraint.ConstraintLayout>
+        <RelativeLayout
+            android:id="@+id/region_maxElo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_toEndOf="@+id/region_minElo"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/textViewMax"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/max_elo_all_time"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="7pt" />
+
+            <TextView
+                android:id="@+id/textViewMaxValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textViewMax"
+                android:layout_centerHorizontal="true"
+                android:text="maxEloValue"
+                android:textColor="@color/colorGreen"
+                android:textSize="10pt" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/region_minElo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/textViewMin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/min_elo_all_time"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="7pt" />
+
+            <TextView
+                android:id="@+id/textViewMinValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textViewMin"
+                android:layout_centerHorizontal="true"
+                android:text="minEloValue"
+                android:textColor="@color/colorRed"
+                android:textSize="10pt" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+
+</RelativeLayout>

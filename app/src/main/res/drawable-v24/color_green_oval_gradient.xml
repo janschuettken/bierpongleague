@@ -5,5 +5,5 @@
     <size
         android:width="300dp"
         android:height="100dp" />
-    <gradient android:type="radial" android:gradientRadius="100" android:angle="0" android:endColor="@android:color/white" android:startColor="@color/colorTeamA" />
+    <gradient android:type="radial" android:gradientRadius="100" android:angle="0" android:endColor="@android:color/white" android:startColor="@color/colorGreen" />
 </shape>

@@ -66,4 +66,6 @@
     <string name="win_ratio">Sieg Quote</string>
     <string name="your_elo_clean">Deine Elo</string>
     <string name="scoreboard">Scoreboard</string>
+    <string name="max_elo_all_time">Höchster Elo Wert</string>
+    <string name="min_elo_all_time">Niedrigster Elo Wert</string>
 </resources>

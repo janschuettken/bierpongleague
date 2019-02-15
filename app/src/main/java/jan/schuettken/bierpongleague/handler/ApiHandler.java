@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import jan.schuettken.bierpongleague.data.EloData;
 import jan.schuettken.bierpongleague.data.GameData;
 import jan.schuettken.bierpongleague.data.UserData;
 import jan.schuettken.bierpongleague.exceptions.DatabaseException;
@@ -59,7 +60,7 @@ public class ApiHandler {
      */
     public ApiHandler(@NonNull String session) {
         this();
-        this.session = session;
+        setSession(session);
     }
 
     /**
@@ -175,9 +176,10 @@ public class ApiHandler {
 
     /**
      * Registers a new User to the Game. Username and Email must be unique
+     *
      * @param user the Userdata
      * @return true if a new user has been created
-     * @throws NoConnectionException Connection Timeout
+     * @throws NoConnectionException  Connection Timeout
      * @throws UsernameTakenException The filled in Username or Email are already taken
      */
     public boolean register(@NonNull UserData user) throws NoConnectionException, UsernameTakenException {
@@ -352,7 +354,46 @@ public class ApiHandler {
         return user;
     }
 
+    /**
+     * @return All EloLogs from the logged in user
+     * @throws SessionErrorException session is not set or outdated
+     * @throws NoConnectionException Connection Timeout
+     * @throws JSONException         the file is bad - might be an server problem
+     * @throws RuntimeException      in here the server response is stored
+     */
+    public List<EloData> getEloLog() throws JSONException, SessionErrorException, RuntimeException, NoConnectionException {
+        return getEloLog(0);
+    }
 
+    /**
+     * @param userId The userId which elo will be returned - power >= 100 is required to chose from all users
+     * @return All EloLogs from the logged in user
+     * @throws SessionErrorException session is not set or outdated
+     * @throws NoConnectionException Connection Timeout
+     * @throws JSONException         the file is bad - might be an server problem
+     * @throws RuntimeException      in here the server response is stored
+     */
+    public List<EloData> getEloLog(int userId) throws JSONException, SessionErrorException, RuntimeException, NoConnectionException {
+        String fileUrl = SERVER_URL + "getEloLog.php?session=" + session;
+        if (userId > 0)
+            fileUrl += "&userId=" + userId;
+        Log.e("CALL",fileUrl);
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response.equalsIgnoreCase("#fail#session error"))
+            throw new SessionErrorException(response);
+        if (response.startsWith("#fail#"))
+            throw new RuntimeException(response);
+
+        JSONArray gameObjects = new JSONArray(response);
+
+        ArrayList<EloData> eloLog = new ArrayList<>();
+
+        for (int i = 0; i < gameObjects.length(); i++) {
+            JSONObject c = gameObjects.getJSONObject(i);
+            eloLog.add(new EloData(c));
+        }
+        return eloLog;
+    }
 
     /**
      * @return this will get a UserData of the current logged in User
@@ -370,8 +411,6 @@ public class ApiHandler {
 
         JSONObject gameObject = new JSONObject(response);
 
-        UserData user = new UserData(gameObject);
-
-        return user;
+        return new UserData(gameObject);
     }
 }

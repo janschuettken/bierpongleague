@@ -140,21 +140,21 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
 
         if (game.getScores()[0] < game.getScores()[1]) {//the blue/green team is always the winner
             RelativeLayout rl = vi.findViewById(R.id.color_region_player);
-            Drawable d = context.getDrawable(R.drawable.color_team_b_gradient);
+            Drawable d = context.getDrawable(R.drawable.color_red_gradient);
             rl.setBackground(d);
 
             rl = vi.findViewById(R.id.color_region_b);
-            d = context.getDrawable(R.drawable.color_team_a_gradient);
+            d = context.getDrawable(R.drawable.color_green_gradient);
             rl.setBackground(d);
             vi.findViewById(R.id.imageView_crone).setVisibility(View.INVISIBLE);
             vi.findViewById(R.id.imageView_crone_team_b).setVisibility(View.VISIBLE);
         } else {
             RelativeLayout rl = vi.findViewById(R.id.color_region_player);
-            Drawable d = context.getDrawable(R.drawable.color_team_a_gradient);
+            Drawable d = context.getDrawable(R.drawable.color_green_gradient);
             rl.setBackground(d);
 
             rl = vi.findViewById(R.id.color_region_b);
-            d = context.getDrawable(R.drawable.color_team_b_gradient);
+            d = context.getDrawable(R.drawable.color_red_gradient);
             rl.setBackground(d);
             vi.findViewById(R.id.imageView_crone).setVisibility(View.VISIBLE);
             vi.findViewById(R.id.imageView_crone_team_b).setVisibility(View.INVISIBLE);

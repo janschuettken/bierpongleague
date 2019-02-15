@@ -22,7 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
-                android:background="@drawable/border_team_a"
+                android:background="@drawable/border_green"
                 android:orientation="vertical"
                 android:padding="15dp">
 
@@ -76,7 +76,7 @@
                             android:ems="10"
                             android:hint="@string/score"
                             android:inputType="numberSigned"
-                            android:textColor="@color/colorTeamA"
+                            android:textColor="@color/colorGreen"
                             tools:ignore="Autofill" />
 
                     </android.support.design.widget.TextInputLayout>
@@ -99,7 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
-                android:background="@drawable/border_team_b"
+                android:background="@drawable/border_red"
                 android:orientation="vertical"
                 android:padding="15dp">
 
@@ -153,7 +153,7 @@
                             android:ems="10"
                             android:hint="@string/score"
                             android:inputType="numberSigned"
-                            android:textColor="@color/colorTeamB"
+                            android:textColor="@color/colorRed"
                             tools:ignore="Autofill" />
                     </android.support.design.widget.TextInputLayout>
 
