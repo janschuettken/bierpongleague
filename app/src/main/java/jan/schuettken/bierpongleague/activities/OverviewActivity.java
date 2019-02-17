@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.SpannableString;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -150,11 +149,9 @@ public class OverviewActivity extends BasicDrawerPage {
         for (GameData g : games) {
             if (!g.isWon()) {
                 liters += (.5f * ((float) (10 - g.getScores()[0]) / 10.0f));
-                Log.e("BEER-W", liters + "");
             } else {
                 liters += .5f;
                 liters += (.5f * ((float) (g.getScores()[0]) / 10.0f));
-                Log.e("BEER-L", liters + "");
             }
         }
         final float finalLiters = liters;

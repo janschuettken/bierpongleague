@@ -69,4 +69,8 @@
     <string name="max_elo_all_time">Höchster Elo Wert</string>
     <string name="min_elo_all_time">Niedrigster Elo Wert</string>
     <string name="beers_drunk_all_time">Du hast bereits %1$d Liter Bier getrunken.</string>
+    <string name="more">Mehr</string>
+    <string name="share">Teilen</string>
+    <string name="logout">Logout</string>
+    <string name="text_share">*Beerpong League* <br /> Messe dich mit anderen Beerpong Spielern in einem Rang System<br /> https://play.google.com/store/apps/details?id=jan.schuettken.bierpongleague</string>
 </resources>

@@ -1,5 +1,6 @@
 package jan.schuettken.bierpongleague.basic;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -24,6 +25,7 @@ import jan.schuettken.bierpongleague.data.UserData;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
 import jan.schuettken.bierpongleague.handler.ApiHandler;
+import jan.schuettken.bierpongleague.handler.PreferencesHandler;
 
 /**
  * Created by Jan Schüttken on 03.11.2018 at 11:50
@@ -92,6 +94,7 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
+
         switch (item.getItemId()) {
             case R.id.nav_overview:
                 if (!(this instanceof OverviewActivity)) {
@@ -119,14 +122,29 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
                 }
                 break;
             case R.id.nav_share:
+                shareApp();
                 break;
-            case R.id.nav_send:
+            case R.id.nav_logout:
+                PreferencesHandler preferencesHandler = new PreferencesHandler(this);
+                preferencesHandler.setPassword("");
+                preferencesHandler.setUsername("");
+                preferencesHandler.setSessionId("");
+                switchView(LoginActivity.class, true);
                 break;
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void shareApp(){
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT,
+                "*Beerpong League*\nMesse dich mit anderen Beerpong Spielern in einem Rang System\n https://play.google.com/store/apps/details?id=jan.schuettken.bierpongleague");
+        sendIntent.setType("text/plain");
+        startActivity(sendIntent);
     }
 
     /**
@@ -142,4 +160,5 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
     protected void selectPage(int id) {
         ((NavigationView) findViewById(R.id.nav_view)).getMenu().findItem(id).setChecked(true);
     }
+
 }
