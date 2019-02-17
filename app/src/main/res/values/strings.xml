@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name"><b>BIERPONG</b><i>league</i></string>
+    <string name="app_name"><b>BEERPONG</b><i>league</i></string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -68,4 +68,5 @@
     <string name="scoreboard">Scoreboard</string>
     <string name="max_elo_all_time">Höchster Elo Wert</string>
     <string name="min_elo_all_time">Niedrigster Elo Wert</string>
+    <string name="beers_drunk_all_time">Du hast bereits %1$d Liter Bier getrunken.</string>
 </resources>

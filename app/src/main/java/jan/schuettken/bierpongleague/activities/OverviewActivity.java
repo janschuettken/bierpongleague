@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.SpannableString;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -143,6 +144,31 @@ public class OverviewActivity extends BasicDrawerPage {
         return stats;
     }
 
+    private void initializeBeersDrunk(List<GameData> games) {
+
+        float liters = 0;
+        for (GameData g : games) {
+            if (!g.isWon()) {
+                liters += (.5f * ((float) (10 - g.getScores()[0]) / 10.0f));
+                Log.e("BEER-W", liters + "");
+            } else {
+                liters += .5f;
+                liters += (.5f * ((float) (g.getScores()[0]) / 10.0f));
+                Log.e("BEER-L", liters + "");
+            }
+        }
+        final float finalLiters = liters;
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                TextView tv = findViewById(R.id.beers_drunk);
+                tv.setText(getResString(R.string.beers_drunk_all_time, (int) finalLiters));
+            }
+        });
+
+    }
+
     @SuppressLint("SetTextI18n")
     private void initializeElo() throws SessionErrorException, JSONException, NoConnectionException {
         UserData you = apiHandler.getYourself();
@@ -240,12 +266,13 @@ public class OverviewActivity extends BasicDrawerPage {
             @Override
             public void run() {
                 try {
-                    final List<GameData> items = apiHandler.getGames(apiHandler.getYourself(), true);
+                    final List<GameData> games = apiHandler.getGames(apiHandler.getYourself(), true);
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            if (items != null) {
-                                setItemDataCategoryChart(items);
+                            if (games != null) {
+                                initializeBeersDrunk(games);
+                                setItemDataCategoryChart(games);
                                 pieChartWinLoseClick.onNothingSelected();
                                 pieChartWinLose.invalidate();
                                 pieChartWinLose.animateX(2500);
@@ -265,7 +292,6 @@ public class OverviewActivity extends BasicDrawerPage {
         WinLoseRatio.add(0.0);//Wins
         WinLoseRatio.add(0.0);//Loses
 
-        int allTimePlayed = 0;
         for (GameData i : games) {
 
             if (i.getScores()[0] > 0) {
@@ -273,10 +299,9 @@ public class OverviewActivity extends BasicDrawerPage {
             } else {
                 WinLoseRatio.set(1, WinLoseRatio.get(1) + 1);
             }
-            allTimePlayed++;
 
         }
-        pieChartWinLoseClick.setAllTime(allTimePlayed);
+        pieChartWinLoseClick.setAllTime(games.size());
         float percent;
         if (WinLoseRatio.get(1) > 0)
             percent = (float) (WinLoseRatio.get(0) / WinLoseRatio.get(1));
@@ -326,7 +351,7 @@ public class OverviewActivity extends BasicDrawerPage {
         pieChartWinLose.setDrawingCacheBackgroundColor(Color.BLACK);
         pieChartWinLose.setNoDataTextColor(Color.BLACK);
 //        dataOut.setValueTypeface(mTfLight);
-        pieChartWinLose.setCenterText(MyOnChartValueSelectedListener.generateCenterSpannableText(getString(R.string.games_all_time) + "\n" + allTimePlayed));
+        pieChartWinLose.setCenterText(MyOnChartValueSelectedListener.generateCenterSpannableText(getString(R.string.games_all_time) + "\n" + games.size()));
         pieChartWinLose.setData(dataOut);
         // undo all highlights
         pieChartWinLose.highlightValues(null);

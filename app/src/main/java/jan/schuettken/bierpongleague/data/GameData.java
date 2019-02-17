@@ -196,6 +196,14 @@ public class GameData {
         return false;
     }
 
+    /**
+     * Checks if Team 1 has won the Match
+     * @return true if Team 1 has won
+     */
+    public boolean isWon() {
+        return getScores()[0] > getScores()[1];
+    }
+
     public void setParticipants(UserData[] participants) {
         this.participants = participants;
     }
@@ -245,7 +253,7 @@ public class GameData {
         @SuppressLint("SimpleDateFormat")
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
-            this.date = format.parse ( date);
+            this.date = format.parse(date);
         } catch (ParseException e) {
             this.date = null;
             e.printStackTrace();
