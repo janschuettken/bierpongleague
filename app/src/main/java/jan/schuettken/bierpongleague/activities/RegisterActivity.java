@@ -46,7 +46,7 @@ public class RegisterActivity extends BasicPage {
         user.setNickName(checkPartField(R.id.nick_name, -2, check));
         user.setUsername(checkPartField(R.id.username, 3, check));
         user.setEmail(checkPartField(R.id.mail, 5, check));
-        user.setPassword(checkPartField(R.id.password, 2, check));
+        user.setPassword(checkPartField(R.id.password, 8, check));
         user.setGender(((Spinner) findViewById(R.id.spinner_gender)).getSelectedItemPosition());
 
         return check.check;

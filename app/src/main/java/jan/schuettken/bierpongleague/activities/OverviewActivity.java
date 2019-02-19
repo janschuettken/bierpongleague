@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.text.SpannableString;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -144,18 +145,22 @@ public class OverviewActivity extends BasicDrawerPage {
     }
 
     private void initializeBeersDrunk(List<GameData> games) {
-
         float liters = 0;
-        for (GameData g : games) {
-            if (!g.isWon()) {
-                liters += (.5f * ((float) (10 - g.getScores()[0]) / 10.0f));
-            } else {
-                liters += .5f;
-                liters += (.5f * ((float) (g.getScores()[0]) / 10.0f));
+
+        if (games != null) {
+
+            for (GameData g : games) {
+                if (!g.isWon()) {
+                    liters += (.5f * ((float) (10 - g.getScores()[0]) / 10.0f));
+                } else {
+                    liters += .5f;
+                    liters += (.5f * ((float) (g.getScores()[0]) / 10.0f));
+                }
             }
+
+
         }
         final float finalLiters = liters;
-
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -163,6 +168,7 @@ public class OverviewActivity extends BasicDrawerPage {
                 tv.setText(getResString(R.string.beers_drunk_all_time, (int) finalLiters));
             }
         });
+
 
     }
 
@@ -264,19 +270,29 @@ public class OverviewActivity extends BasicDrawerPage {
             public void run() {
                 try {
                     final List<GameData> games = apiHandler.getGames(apiHandler.getYourself(), true);
+                    initializeBeersDrunk(games);
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
                             if (games != null) {
-                                initializeBeersDrunk(games);
+                                findViewById(R.id.region_win_lose_stats).setVisibility(View.VISIBLE);
                                 setItemDataCategoryChart(games);
                                 pieChartWinLoseClick.onNothingSelected();
                                 pieChartWinLose.invalidate();
                                 pieChartWinLose.animateX(2500);
                             }
+
                         }
                     });
                 } catch (NoConnectionException | SessionErrorException | JSONException e) {
+                    initializeBeersDrunk(null);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            //don't show the win/lose stats if no games have been played
+                            findViewById(R.id.region_win_lose_stats).setVisibility(View.GONE);
+                        }
+                    });
                 }
             }
         }.start();

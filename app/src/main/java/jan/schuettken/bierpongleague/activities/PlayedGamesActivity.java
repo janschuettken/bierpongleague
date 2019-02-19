@@ -6,6 +6,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.View;
 
 import org.json.JSONException;
 
@@ -39,7 +40,7 @@ public class PlayedGamesActivity extends BasicDrawerPage {
         initializeList();
     }
 
-    private void initializeRefreshListener(){
+    private void initializeRefreshListener() {
         swipeContainer = findViewById(R.id.swipeContainer);
 
         // Setup refresh listener which triggers new data loading
@@ -101,6 +102,7 @@ public class PlayedGamesActivity extends BasicDrawerPage {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
+                            findViewById(R.id.no_games_played_warning).setVisibility(View.GONE);
                             recyclerList.getItems().clear();
                             recyclerList.getItems().addAll(games);
                             templateList.setAdapter(recyclerList);
@@ -109,10 +111,26 @@ public class PlayedGamesActivity extends BasicDrawerPage {
                     });
 
                 } catch (NoConnectionException | SessionErrorException | JSONException e) {
-                    //should not happen
-                    e.printStackTrace();
+                    //no games are played
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            findViewById(R.id.no_games_played_warning).setVisibility(View.VISIBLE);
+                            swipeContainer.setRefreshing(false);
+                        }
+                    });
+
                 }
             }
         }.start();
+    }
+
+    private void setRefreshing(final boolean refresh) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeContainer.setRefreshing(refresh);
+            }
+        });
     }
 }

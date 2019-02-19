@@ -111,6 +111,9 @@ public class EloTrendActivity extends BasicDrawerPage {
                             minElo = elos.get(i).getValue();
                         lineEntries.add(new Entry(i + 1, (float) elos.get(i).getValue()));
                     }
+                    if (lineEntries.isEmpty()) {
+                        lineEntries.add(new Entry(1, 0));
+                    }
                     if (!lineEntries.isEmpty()) {
                         lineDataSet.clear();
                         for (Entry e : lineEntries)
@@ -132,11 +135,16 @@ public class EloTrendActivity extends BasicDrawerPage {
                             }
                         });
                     }
-                } catch (JSONException | SessionErrorException | NoConnectionException e) {
+                } catch (JSONException | SessionErrorException |
+                        NoConnectionException e)
+
+                {
                     e.printStackTrace();
                 }
             }
-        }.start();
+        }.
+
+                start();
 
 
     }
