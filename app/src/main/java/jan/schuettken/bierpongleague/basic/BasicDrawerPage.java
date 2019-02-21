@@ -2,10 +2,13 @@ package jan.schuettken.bierpongleague.basic;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.pm.PackageInfoCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -145,6 +148,9 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
             case R.id.nav_share:
                 shareApp();
                 break;
+            case R.id.nav_version:
+                showAppVersionToast();
+                break;
             case R.id.nav_logout:
                 PreferencesHandler preferencesHandler = new PreferencesHandler(this);
                 preferencesHandler.setPassword("");
@@ -157,6 +163,22 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showAppVersionToast() {
+        PackageManager manager = getPackageManager();
+        String versionName;
+        int versionCode = -1;
+        try {
+            PackageInfo info = manager.getPackageInfo(getPackageName(), 0);
+            versionName = info.versionName;
+            versionCode = (int) PackageInfoCompat.getLongVersionCode(info);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            versionName = "Unknown";
+        }
+
+        showToast(getResString(R.string.app_version) + ": " + versionName + " (Build " + versionCode + ")");
     }
 
     private void shareApp() {

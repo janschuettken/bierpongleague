@@ -40,6 +40,10 @@
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/ic_power_settings_new_black_24dp"
                 android:title="@string/logout"/>
+            <item
+                android:id="@+id/nav_version"
+                android:icon="@drawable/ic_child_care_black_24dp"
+                android:title="@string/app_version"/>
         </menu>
     </item>
 
