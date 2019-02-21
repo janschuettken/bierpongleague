@@ -377,7 +377,7 @@ public class ApiHandler {
         String fileUrl = SERVER_URL + "getEloLog.php?session=" + session;
         if (userId > 0)
             fileUrl += "&userId=" + userId;
-        Log.e("CALL",fileUrl);
+        Log.e("CALL", fileUrl);
         String response = serverHandler.getJsonFromServer(fileUrl);
         if (response.equalsIgnoreCase("#fail#session error"))
             throw new SessionErrorException(response);
@@ -389,6 +389,33 @@ public class ApiHandler {
         ArrayList<EloData> eloLog = new ArrayList<>();
 
         for (int i = 0; i < gameObjects.length(); i++) {
+            JSONObject c = gameObjects.getJSONObject(i);
+            eloLog.add(new EloData(c));
+        }
+        return eloLog;
+    }
+
+    /**
+     * @return Last 5 EloLogs from the logged in user in reverse order
+     * @throws SessionErrorException session is not set or outdated
+     * @throws NoConnectionException Connection Timeout
+     * @throws JSONException         the file is bad - might be an server problem
+     * @throws RuntimeException      in here the server response is stored
+     */
+    public List<EloData> getEloPreview() throws JSONException, SessionErrorException, RuntimeException, NoConnectionException {
+        String fileUrl = SERVER_URL + "getEloPreview.php?session=" + session;
+        Log.e("CALL", fileUrl);
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response.equalsIgnoreCase("#fail#session error"))
+            throw new SessionErrorException(response);
+        if (response.startsWith("#fail#"))
+            throw new RuntimeException(response);
+
+        JSONArray gameObjects = new JSONArray(response);
+
+        ArrayList<EloData> eloLog = new ArrayList<>();
+
+        for (int i = gameObjects.length() - 1; i >= 0; i--) {
             JSONObject c = gameObjects.getJSONObject(i);
             eloLog.add(new EloData(c));
         }

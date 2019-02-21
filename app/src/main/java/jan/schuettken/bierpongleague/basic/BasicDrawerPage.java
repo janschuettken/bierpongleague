@@ -1,6 +1,9 @@
 package jan.schuettken.bierpongleague.basic;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -11,7 +14,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+
 import org.json.JSONException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.activities.AddGameActivity;
@@ -21,6 +34,7 @@ import jan.schuettken.bierpongleague.activities.LoginActivity;
 import jan.schuettken.bierpongleague.activities.OverviewActivity;
 import jan.schuettken.bierpongleague.activities.PlayedGamesActivity;
 import jan.schuettken.bierpongleague.activities.ScoreboardActivity;
+import jan.schuettken.bierpongleague.data.EloData;
 import jan.schuettken.bierpongleague.data.UserData;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
@@ -34,6 +48,10 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
 
     public final static String CURRENT_USER = "CURRENT_USER";
     protected UserData currentUser = null;
+    private LineDataSet lineDataSetPreview;
+    private LineChart lineChartPreview;
+    private Handler handler;
+    private ApiHandler apiHandler;
 
     @Override
     public void setContentView(int contentView) {
@@ -66,7 +84,7 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
         //fill Header with information
         View head = navigationView.getHeaderView(navigationView.getHeaderCount() - 1);
         TextView welcome = head.findViewById(R.id.text_name);
-        welcome.setText(getResString(R.string.hello_user, currentUser.getFullName()));
+        welcome.setText(currentUser.getFullName());
         TextView elo = head.findViewById(R.id.text_elo);
         elo.setText(getResString(R.string.your_elo, (int) currentUser.getElo()));
 
@@ -78,6 +96,9 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
             }
         });
 
+        handler = new Handler();
+        apiHandler = createApiHandler();
+        initializeLineChart(head);
         selectPage();
     }
 
@@ -138,7 +159,7 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
         return true;
     }
 
-    private void shareApp(){
+    private void shareApp() {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT,
@@ -159,6 +180,108 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
      */
     protected void selectPage(int id) {
         ((NavigationView) findViewById(R.id.nav_view)).getMenu().findItem(id).setChecked(true);
+    }
+
+
+    private void initializeLineChart(View head) {
+        lineChartPreview = head.findViewById(R.id.elo_preview_line_chart);
+
+        ArrayList<Entry> lineEntries = new ArrayList<>();
+        lineDataSetPreview = new LineDataSet(lineEntries, getResString(R.string.elo_trend));
+        lineDataSetPreview.setAxisDependency(YAxis.AxisDependency.LEFT);
+        lineDataSetPreview.setHighlightEnabled(false);
+        lineDataSetPreview.setLineWidth(2);
+        lineDataSetPreview.setColor(getColor(R.color.colorPrimary));
+        lineDataSetPreview.setCircleColor(getColor(R.color.colorAccent));
+        lineDataSetPreview.setCircleRadius(6);
+        lineDataSetPreview.setCircleHoleRadius(3);
+        lineDataSetPreview.setDrawHighlightIndicators(false);
+        lineDataSetPreview.setHighLightColor(Color.RED);
+        lineDataSetPreview.setValueTextSize(12);
+        lineDataSetPreview.setValueTextColor(getColor(R.color.colorBlueDark));
+        lineDataSetPreview.setDrawValues(false);
+        lineDataSetPreview.setDrawFilled(true);
+
+        LineData lineData = new LineData(lineDataSetPreview);
+
+        lineChartPreview.getDescription().setText("");
+        lineChartPreview.getDescription().setTextSize(12);
+        lineChartPreview.setDrawMarkers(true);
+//        lineChartPreview.setMarker(markerView(context));
+//        lineChartPreview.getAxisLeft().addLimitLine(lowerLimitLine(2,"Lower Limit",2,12,getColor("defaultOrange"),getColor("defaultOrange")));
+//        lineChartPreview.getAxisLeft().addLimitLine(upperLimitLine(5,"Upper Limit",2,12,getColor("defaultGreen"),getColor("defaultGreen")));
+        lineChartPreview.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        lineChartPreview.animateY(1000);
+        lineChartPreview.getXAxis().setGranularityEnabled(false);
+        lineChartPreview.getXAxis().setGranularity(1.0f);
+        lineChartPreview.getXAxis().setLabelCount(lineDataSetPreview.getEntryCount());
+        lineChartPreview.getXAxis().setDrawLabels(false);
+        lineChartPreview.getXAxis().setDrawGridLines(false);
+        lineChartPreview.getXAxis().setDrawLabels(false);
+        lineChartPreview.getAxisLeft().setDrawLabels(false);
+        lineChartPreview.getAxisRight().setDrawLabels(false);
+        lineChartPreview.getAxisLeft().setDrawGridLines(false);
+        lineChartPreview.getAxisRight().setDrawGridLines(false);
+        lineChartPreview.setData(lineData);
+        lineChartPreview.getLegend().setEnabled(false);
+
+        refreshLineChart(head);
+    }
+
+    private void refreshLineChart(final View head) {
+
+        new Thread() {
+            @Override
+            public void run() {
+
+                try {
+                    List<EloData> elos = apiHandler.getEloPreview();
+                    if (elos != null) {
+                        final List<Entry> lineEntries = new ArrayList<>();
+                        final double startElo = elos.get(0).getValue(), endElo = elos.get(elos.size() - 1).getValue();
+                        for (int i = 0; i < elos.size(); i++) {
+                            lineEntries.add(new Entry(i + 1, (float) elos.get(i).getValue()));
+                        }
+                        if (lineEntries.isEmpty()) {
+                            lineEntries.add(new Entry(1, 0));
+                        }
+                        if (!lineEntries.isEmpty()) {
+                            lineDataSetPreview.clear();
+                            for (Entry e : lineEntries)
+                                lineDataSetPreview.addEntry(e);
+                            LineData lineData = new LineData(lineDataSetPreview);
+
+                            lineChartPreview.setData(lineData);
+
+                            handler.post(new Runnable() {
+                                @SuppressLint("SetTextI18n")
+                                @Override
+                                public void run() {
+                                    lineChartPreview.invalidate();
+                                    TextView tv = head.findViewById(R.id.eloPreviewText);
+                                    int diff = (int) (endElo - startElo);
+                                    String prefix = "↑";
+                                    tv.setTextColor(getColor(R.color.colorGreenLight));
+                                    if (diff < 0) {
+                                        prefix = "↓";
+                                        tv.setTextColor(getColor(R.color.colorRedLight));
+                                    }
+                                    tv.setText(prefix + Math.abs(diff));
+
+                                }
+                            });
+                        }
+                    }
+                } catch (JSONException | SessionErrorException |
+                        NoConnectionException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.
+
+                start();
+
+
     }
 
 }

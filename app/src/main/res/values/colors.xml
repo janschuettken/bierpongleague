@@ -3,8 +3,10 @@
     <color name="colorPrimary">#00579e</color>
     <color name="colorPrimaryDark">#001957</color>
     <color name="colorAccent">#d8b21b</color>
+    <color name="colorGreenLight">#4AE960</color>
     <color name="colorGreen">#39b54a</color>
     <color name="colorGreenDark">#007245</color>
+    <color name="colorRedLight">#F83D46</color>
     <color name="colorRed">#c1272d</color>
     <color name="colorRedDark">#7e0000</color>
     <color name="colorGold">#ffd700</color>
