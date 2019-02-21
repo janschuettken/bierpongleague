@@ -1,8 +1,12 @@
 package jan.schuettken.bierpongleague.activities;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.pm.PackageInfoCompat;
 import android.view.View;
+import android.widget.TextView;
 
 import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.basic.BasicPage;
@@ -23,6 +27,7 @@ public class StartActivity extends BasicPage {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         doBackgroundLogin();
+        showAppVersionToast();
     }
 
     private void doBackgroundLogin() {
@@ -69,6 +74,23 @@ public class StartActivity extends BasicPage {
             });
 
         }
+    }
+
+    private void showAppVersionToast() {
+        PackageManager manager = getPackageManager();
+        String versionName;
+        int versionCode = -1;
+        try {
+            PackageInfo info = manager.getPackageInfo(getPackageName(), 0);
+            versionName = info.versionName;
+            versionCode = (int) PackageInfoCompat.getLongVersionCode(info);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            versionName = "Unknown";
+        }
+
+        TextView tv = findViewById(R.id.textView_version);
+        tv.setText(getResString(R.string.show_version, versionName, versionCode));
     }
 
     public void retryConnectToServer(View view) {

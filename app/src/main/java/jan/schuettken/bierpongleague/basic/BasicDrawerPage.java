@@ -178,7 +178,7 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
             versionName = "Unknown";
         }
 
-        showToast(getResString(R.string.app_version) + ": " + versionName + " (Build " + versionCode + ")");
+        showToast(getResString(R.string.show_version, versionName, versionCode));
     }
 
     private void shareApp() {

@@ -57,4 +57,13 @@
         android:backgroundTint="@color/colorAccent"
         android:onClick="retryConnectToServer"
         android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/textView_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
+        android:text="@string/app_version" />
 </RelativeLayout>
