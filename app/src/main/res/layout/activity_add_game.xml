@@ -22,7 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
-                android:background="@drawable/border_green"
+                android:background="@drawable/border_prime_color"
                 android:orientation="vertical"
                 android:padding="15dp">
 
@@ -56,6 +56,14 @@
                         android:inputType="textPersonName" />
                 </android.support.design.widget.TextInputLayout>
 
+                <SeekBar
+                    android:id="@+id/seekBar_score_team_a"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="10"
+                    android:progress="10" />
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -76,7 +84,7 @@
                             android:ems="10"
                             android:hint="@string/score"
                             android:inputType="numberSigned"
-                            android:textColor="@color/colorGreen"
+                            android:textColor="@color/colorAccent"
                             tools:ignore="Autofill" />
 
                     </android.support.design.widget.TextInputLayout>
@@ -91,7 +99,6 @@
                         android:backgroundTint="@android:color/darker_gray"
                         android:onClick="showScoreHint" />
                 </RelativeLayout>
-
             </LinearLayout>
 
             <LinearLayout
@@ -99,7 +106,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
-                android:background="@drawable/border_red"
+                android:background="@drawable/border_prime_color"
                 android:orientation="vertical"
                 android:padding="15dp">
 
@@ -133,6 +140,14 @@
                         android:inputType="textPersonName" />
                 </android.support.design.widget.TextInputLayout>
 
+                <SeekBar
+                    android:id="@+id/seekBar_score_team_b"
+                    style="@style/Widget.AppCompat.SeekBar.Discrete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="10"
+                    android:progress="10" />
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -153,7 +168,7 @@
                             android:ems="10"
                             android:hint="@string/score"
                             android:inputType="numberSigned"
-                            android:textColor="@color/colorRed"
+                            android:textColor="@color/colorAccent"
                             tools:ignore="Autofill" />
                     </android.support.design.widget.TextInputLayout>
 

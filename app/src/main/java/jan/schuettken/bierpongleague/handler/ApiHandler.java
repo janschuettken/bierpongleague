@@ -377,7 +377,6 @@ public class ApiHandler {
         String fileUrl = SERVER_URL + "getEloLog.php?session=" + session;
         if (userId > 0)
             fileUrl += "&userId=" + userId;
-        Log.e("CALL", fileUrl);
         String response = serverHandler.getJsonFromServer(fileUrl);
         if (response.equalsIgnoreCase("#fail#session error"))
             throw new SessionErrorException(response);

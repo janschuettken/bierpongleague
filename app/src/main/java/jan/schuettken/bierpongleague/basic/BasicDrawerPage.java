@@ -152,17 +152,21 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
                 showAppVersionToast();
                 break;
             case R.id.nav_logout:
-                PreferencesHandler preferencesHandler = new PreferencesHandler(this);
-                preferencesHandler.setPassword("");
-                preferencesHandler.setUsername("");
-                preferencesHandler.setSessionId("");
-                switchView(LoginActivity.class, true);
+                logout();
                 break;
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void logout(){
+        PreferencesHandler preferencesHandler = new PreferencesHandler(this);
+        preferencesHandler.setPassword("");
+        preferencesHandler.setUsername("");
+        preferencesHandler.setSessionId("");
+        switchView(LoginActivity.class, true);
     }
 
     private void showAppVersionToast() {
@@ -215,8 +219,9 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
         lineDataSetPreview.setLineWidth(2);
         lineDataSetPreview.setColor(getColor(R.color.colorPrimary));
         lineDataSetPreview.setCircleColor(getColor(R.color.colorAccent));
-        lineDataSetPreview.setCircleRadius(6);
-        lineDataSetPreview.setCircleHoleRadius(3);
+        lineDataSetPreview.setCircleRadius(2);
+        lineDataSetPreview.setCircleHoleRadius(1);
+        lineDataSetPreview.setDrawCircles(false);
         lineDataSetPreview.setDrawHighlightIndicators(false);
         lineDataSetPreview.setHighLightColor(Color.RED);
         lineDataSetPreview.setValueTextSize(12);
@@ -233,7 +238,7 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
 //        lineChartPreview.getAxisLeft().addLimitLine(lowerLimitLine(2,"Lower Limit",2,12,getColor("defaultOrange"),getColor("defaultOrange")));
 //        lineChartPreview.getAxisLeft().addLimitLine(upperLimitLine(5,"Upper Limit",2,12,getColor("defaultGreen"),getColor("defaultGreen")));
         lineChartPreview.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-        lineChartPreview.animateY(1000);
+//        lineChartPreview.animateY(1000);
         lineChartPreview.getXAxis().setGranularityEnabled(false);
         lineChartPreview.getXAxis().setGranularity(1.0f);
         lineChartPreview.getXAxis().setLabelCount(lineDataSetPreview.getEntryCount());

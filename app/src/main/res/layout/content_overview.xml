@@ -148,7 +148,7 @@
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/pie_chart_category_out"
                 android:layout_width="match_parent"
-                android:layout_height="400dp" />
+                android:layout_height="300dp" />
         </LinearLayout>
 
 

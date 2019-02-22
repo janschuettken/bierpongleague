@@ -77,7 +77,7 @@ public class OverviewActivity extends BasicDrawerPage {
 //        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.played_games);
         initializeHandler();
 //        initializeStats();
-        initPieChartOut();
+        initPieChart();
         refreshCharts();
         try {
             initializeElo();
@@ -210,11 +210,12 @@ public class OverviewActivity extends BasicDrawerPage {
         }.start();
     }
 
-    private void initPieChartOut() {
+    private void initPieChart() {
         pieChartWinLose = findViewById(R.id.pie_chart_category_out);
         pieChartWinLose.setUsePercentValues(true);
         pieChartWinLose.getDescription().setEnabled(false);
-        pieChartWinLose.setExtraOffsets(5, 10, 5, 5);
+//        pieChartWinLose.setExtraOffsets(5, 10, 5, 5);
+        pieChartWinLose.setExtraOffsets(0,0,0,0);
 
         pieChartWinLose.setDragDecelerationFrictionCoef(0.95f);
 
@@ -227,14 +228,14 @@ public class OverviewActivity extends BasicDrawerPage {
         pieChartWinLose.setTransparentCircleColor(Color.WHITE);
         pieChartWinLose.setTransparentCircleAlpha(110);
 
-        pieChartWinLose.setHoleRadius(58f);
+        pieChartWinLose.setHoleRadius(68f);
         pieChartWinLose.setTransparentCircleRadius(61f);
 
         pieChartWinLose.setDrawCenterText(true);
 
         pieChartWinLose.setRotationAngle(0);
         // enable rotation of the chart by touch
-        pieChartWinLose.setRotationEnabled(true);
+        pieChartWinLose.setRotationEnabled(false);
         pieChartWinLose.setHighlightPerTapEnabled(true);
 
         // pieChartWinLose.setUnit(" €");
@@ -253,13 +254,13 @@ public class OverviewActivity extends BasicDrawerPage {
         l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
         l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
         l.setDrawInside(false);
-        l.setXEntrySpace(7f);
+        l.setXEntrySpace(0f);
         l.setYEntrySpace(0f);
         l.setYOffset(0f);
         l.setEnabled(false);
 
         // entry label styling
-        pieChartWinLose.setEntryLabelColor(Color.WHITE);
+        pieChartWinLose.setEntryLabelColor(Color.BLACK);
 //        pieChartWinLose.setEntryLabelTypeface(mTfRegular);
         pieChartWinLose.setEntryLabelTextSize(12f);
     }

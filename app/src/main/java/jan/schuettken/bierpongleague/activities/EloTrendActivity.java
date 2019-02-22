@@ -73,8 +73,8 @@ public class EloTrendActivity extends BasicDrawerPage {
         lineDataSet.setLineWidth(2);
         lineDataSet.setColor(getColor(R.color.colorPrimary));
         lineDataSet.setCircleColor(getColor(R.color.colorAccent));
-        lineDataSet.setCircleRadius(6);
-        lineDataSet.setCircleHoleRadius(3);
+        lineDataSet.setCircleRadius(4);
+        lineDataSet.setCircleHoleRadius(2);
         lineDataSet.setDrawHighlightIndicators(true);
         lineDataSet.setHighLightColor(Color.RED);
         lineDataSet.setValueTextSize(12);
@@ -159,11 +159,7 @@ public class EloTrendActivity extends BasicDrawerPage {
                     e.printStackTrace();
                 }
             }
-        }.
-
-                start();
-
-
+        }.start();
     }
 
 

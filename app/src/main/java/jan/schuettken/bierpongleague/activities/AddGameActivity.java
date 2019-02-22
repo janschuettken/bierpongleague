@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.SeekBar;
 
 import org.json.JSONException;
 
@@ -51,6 +52,8 @@ public class AddGameActivity extends BasicPage {
 
         final EditText et_a = findViewById(R.id.editText_score_team_a);
         final EditText et_b = findViewById(R.id.editText_score_team_b);
+        final SeekBar seekBar_a = findViewById(R.id.seekBar_score_team_a);
+        final SeekBar seekBar_b = findViewById(R.id.seekBar_score_team_b);
         et_a.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -67,9 +70,12 @@ public class AddGameActivity extends BasicPage {
                 if (!s.toString().equals("")) {
                     try {
                         int number = Integer.parseInt(s.toString());
+
                         if (number > 0) {
                             et_b.setText("0");
                             et_b.setEnabled(false);
+                            seekBar_a.setProgress(number);
+                            seekBar_b.setProgress(0);
                         } else if (number == 0) {
                             et_b.setEnabled(true);
                         } else {
@@ -103,6 +109,8 @@ public class AddGameActivity extends BasicPage {
                         if (number > 0) {
                             et_a.setText("0");
                             et_a.setEnabled(false);
+                            seekBar_b.setProgress(number);
+                            seekBar_a.setProgress(0);
                         } else if (number == 0) {
                             et_a.setEnabled(true);
                         } else {
@@ -118,6 +126,40 @@ public class AddGameActivity extends BasicPage {
             }
         });
 
+        seekBar_a.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                et_a.setText(progress + "");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        seekBar_b.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                et_b.setText(progress + "");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
     private void resetScoreFields(EditText et_a, EditText et_b) {
