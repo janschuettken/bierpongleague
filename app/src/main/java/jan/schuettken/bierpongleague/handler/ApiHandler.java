@@ -161,9 +161,9 @@ public class ApiHandler {
     public boolean login(@NonNull String username, @NonNull String password)
             throws NoConnectionException, InvalidLoginException, DatabaseException {
         String fileUrl = SERVER_URL + "login.php?user=" + username + "&password=" + password;
-        Log.e("LOGIN", fileUrl);
+        //Log.e("LOGIN", fileUrl);
         String response = serverHandler.getJsonFromServer(fileUrl);
-        Log.e("LOGIN", response);
+        //Log.e("LOGIN", response);
         if (response.startsWith("#fail#wrongPassword") || response.startsWith("#fail#usernameNotTaken"))
             throw new InvalidLoginException(response);
         if (response.startsWith("#fail#"))

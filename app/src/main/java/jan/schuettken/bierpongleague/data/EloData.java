@@ -17,6 +17,7 @@ public class EloData {
     private int Id, UserId, GameId;
     private double Value;
     private Date date;
+    private Date gameDate;
 
     public EloData(int id, int userId, int gameId, double value, Date date) {
         Id = id;
@@ -35,6 +36,12 @@ public class EloData {
         }
         setId(c.getInt("LogId"));
         setDate(c.getString("Date"));
+
+        try {
+            setGameDate(c.getString("GameDate"));
+        } catch (Exception e) {
+            setGameDate((Date) null);
+        }
         setValue(c.getDouble("Value"));
     }
 
@@ -85,6 +92,25 @@ public class EloData {
             this.date = format.parse(date);
         } catch (ParseException e) {
             this.date = null;
+            e.printStackTrace();
+        }
+    }
+
+    public Date getGameDate() {
+        return gameDate;
+    }
+
+    public void setGameDate(Date gameDate) {
+        this.gameDate = gameDate;
+    }
+
+    public void setGameDate(String date) {
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            this.gameDate = format.parse(date);
+        } catch (ParseException e) {
+            this.gameDate = null;
             e.printStackTrace();
         }
     }

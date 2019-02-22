@@ -111,26 +111,31 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
             date.setText(format.format(game.getDate()));
         else
             date.setText("Date Error");
+        setPlayerText((TextView) vi.findViewById(R.id.name_player_first_name), (TextView) vi.findViewById(R.id.name_player_last_name), game, 0);
+        setPlayerText((TextView) vi.findViewById(R.id.name_player_b_first_name), (TextView) vi.findViewById(R.id.name_player_b_last_name), game, 1);
+        setPlayerText((TextView) vi.findViewById(R.id.name_player_c_first_name), (TextView) vi.findViewById(R.id.name_player_c_last_name), game, 2);
+        setPlayerText((TextView) vi.findViewById(R.id.name_player_d_first_name), (TextView) vi.findViewById(R.id.name_player_d_last_name), game, 3);
+//        player = vi.findViewById(R.id.name_player_first_name);
+//        player.setText(game.getParticipant(0).getFirstName());
+//        player.setTextColor(context.getColor(R.color.colorGrey));
+//        player.setTextColor(context.getColor(R.color.colorWhite));
+//        player = vi.findViewById(R.id.name_player_last_name);
+//        player.setText(game.getParticipant(0).getLastName());
 
-        player = vi.findViewById(R.id.name_player_first_name);
-        player.setText(game.getParticipant(0).getFirstName());
-        player = vi.findViewById(R.id.name_player_last_name);
-        player.setText(game.getParticipant(0).getLastName());
-
-        player = vi.findViewById(R.id.name_player_b_first_name);
-        player.setText(game.getParticipant(1).getFirstName());
-        player = vi.findViewById(R.id.name_player_b_last_name);
-        player.setText(game.getParticipant(1).getLastName());
-
-        player = vi.findViewById(R.id.name_player_c_first_name);
-        player.setText(game.getParticipant(2).getFirstName());
-        player = vi.findViewById(R.id.name_player_c_last_name);
-        player.setText(game.getParticipant(2).getLastName());
-
-        player = vi.findViewById(R.id.name_player_d_first_name);
-        player.setText(game.getParticipant(3).getFirstName());
-        player = vi.findViewById(R.id.name_player_d_last_name);
-        player.setText(game.getParticipant(3).getLastName());
+//        player = vi.findViewById(R.id.name_player_b_first_name);
+//        player.setText(game.getParticipant(1).getFirstName());
+//        player = vi.findViewById(R.id.name_player_b_last_name);
+//        player.setText(game.getParticipant(1).getLastName());
+//
+//        player = vi.findViewById(R.id.name_player_c_first_name);
+//        player.setText(game.getParticipant(2).getFirstName());
+//        player = vi.findViewById(R.id.name_player_c_last_name);
+//        player.setText(game.getParticipant(2).getLastName());
+//
+//        player = vi.findViewById(R.id.name_player_d_first_name);
+//        player.setText(game.getParticipant(3).getFirstName());
+//        player = vi.findViewById(R.id.name_player_d_last_name);
+//        player.setText(game.getParticipant(3).getLastName());
 
         player = vi.findViewById(R.id.text_score_team_a);
         player.setText(game.getScores()[0] + "");
@@ -178,6 +183,21 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
                 }
             });
         }
+    }
+
+    private void setPlayerText(TextView firstName, TextView lastName, GameData game, int participant) {
+        firstName.setText(game.getParticipant(participant).getFirstName());
+        lastName.setText(game.getParticipant(participant).getLastName());
+
+        if (game.getConfirmedUser(participant) != -1) {
+            firstName.setTextColor(context.getColor(R.color.colorWhite));
+            lastName.setTextColor(context.getColor(R.color.colorWhite));
+        } else {
+            firstName.setTextColor(context.getColor(R.color.colorGreyLight));
+            lastName.setTextColor(context.getColor(R.color.colorGreyLight));
+        }
+
+
     }
 
     private void confirmGame(final int gameId, final boolean confirm) {

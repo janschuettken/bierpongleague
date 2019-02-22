@@ -17,4 +17,6 @@
     <color name="colorBronzeDark">#875320</color>
     <color name="colorBlue">#00579e</color>
     <color name="colorBlueDark">#001957</color>
+    <color name="colorGreyLight">#A2A2A2</color>
+    <color name="colorWhite">#FFFFFF</color>
 </resources>

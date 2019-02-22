@@ -127,7 +127,7 @@ public class GameData {
     }
 
     public void swopTeams() {
-        int tmpScore = scores[0];
+        int tmpScore = scores[0], tmpConfirm;
         scores[0] = scores[1];
         scores[1] = tmpScore;
         UserData tmpUser = participants[0];
@@ -136,6 +136,12 @@ public class GameData {
         tmpUser = participants[1];
         participants[1] = participants[3];
         participants[3] = tmpUser;
+        tmpConfirm = confirmedUser[0];
+        confirmedUser[0] = confirmedUser[2];
+        confirmedUser[2] = tmpConfirm;
+        tmpConfirm = confirmedUser[1];
+        confirmedUser[1] = confirmedUser[3];
+        confirmedUser[3] = tmpConfirm;
     }
 
 
@@ -198,6 +204,7 @@ public class GameData {
 
     /**
      * Checks if Team 1 has won the Match
+     *
      * @return true if Team 1 has won
      */
     public boolean isWon() {
@@ -230,6 +237,10 @@ public class GameData {
 
     public void setConfirmed(int playerPos, int userId) {
         confirmedUser[playerPos] = userId;
+    }
+
+    public int getConfirmedUser(int player) {
+        return confirmedUser[player];
     }
 
     public int getGameId() {
