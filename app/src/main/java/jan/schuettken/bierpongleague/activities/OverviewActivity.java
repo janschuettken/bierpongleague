@@ -51,7 +51,7 @@ public class OverviewActivity extends BasicDrawerPage {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.overview, menu);
+//        getMenuInflater().inflate(R.menu.overview, menu);
         return true;
     }
 
@@ -88,60 +88,7 @@ public class OverviewActivity extends BasicDrawerPage {
 
     private void initializeHandler() {
         handler = new Handler();
-        checkApiHandler();
-    }
-
-    private boolean checkApiHandler() {
         apiHandler = createApiHandler();
-        return apiHandler != null;
-    }
-
-    private void initializeStats() {
-        final TextView played = findViewById(R.id.num_played_games),
-                won = findViewById(R.id.num_won_games),
-                lost = findViewById(R.id.num_lost_games);
-        new Thread() {
-            @Override
-            public void run() {
-                if (!checkApiHandler())
-                    return;
-                try {
-                    final List<GameData> games = apiHandler.getGames(apiHandler.getYourself(), true);
-                    final int[] stats = getBasicGameStats(games);
-                    handler.post(new Runnable() {
-                        @SuppressLint("SetTextI18n")
-                        @Override
-                        public void run() {
-                            played.setText(stats[0] + "");
-                            won.setText(stats[1] + "");
-                            lost.setText(stats[2] + "");
-                        }
-                    });
-
-                } catch (NoConnectionException | SessionErrorException | JSONException e) {
-                    //should not happen
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
-
-    /**
-     * calculates the played/won/lost Games
-     *
-     * @param games the list of all played Games
-     * @return int[played, won, lost]
-     */
-    private int[] getBasicGameStats(List<GameData> games) {
-        int[] stats = {0, 0, 0};
-        for (GameData game : games) {
-            stats[0]++;
-            if (game.getScores()[0] < game.getScores()[1])
-                stats[2]++;
-            else
-                stats[1]++;
-        }
-        return stats;
     }
 
     private void initializeBeersDrunk(List<GameData> games) {
@@ -179,11 +126,11 @@ public class OverviewActivity extends BasicDrawerPage {
         nameField.setText(you.getFirstName() + " " + you.getLastName());
         TextView eloField = findViewById(R.id.your_elo_text);
         eloField.setText(0 + "");
-        slowlyIncreaseElo(2400.0, you.getElo(), eloField);
+        slowlyIncreaseElo(you.getElo(), eloField);
     }
 
-    private void slowlyIncreaseElo(double ms, double elo, final TextView eloField) {
-        final double wait = 10.0, steps;
+    private void slowlyIncreaseElo(double elo, final TextView eloField) {
+        final double wait = 10.0, steps, ms = 2400.0;
         steps = ms / wait;//should be an int otherwise is the shown elo not exactly precise
 
         final double increase = elo / steps;
@@ -215,7 +162,7 @@ public class OverviewActivity extends BasicDrawerPage {
         pieChartWinLose.setUsePercentValues(true);
         pieChartWinLose.getDescription().setEnabled(false);
 //        pieChartWinLose.setExtraOffsets(5, 10, 5, 5);
-        pieChartWinLose.setExtraOffsets(0,0,0,0);
+        pieChartWinLose.setExtraOffsets(0, 0, 0, 0);
 
         pieChartWinLose.setDragDecelerationFrictionCoef(0.95f);
 

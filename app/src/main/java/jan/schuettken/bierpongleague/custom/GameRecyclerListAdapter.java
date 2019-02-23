@@ -224,7 +224,7 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
                 } catch (SessionErrorException | NoConnectionException e) {
                     e.printStackTrace();
                     try {
-                        apiHandler = new ApiHandler(prefHandler.getUsername(), prefHandler.getPassword());
+                        apiHandler = new ApiHandler(prefHandler.getUsername(), prefHandler.getPassword(), context);
                         if (apiHandler.confirmGame(gameId, confirm)) {
                             showConfirmInfoAndReload(handler);
                         }

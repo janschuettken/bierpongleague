@@ -2,15 +2,10 @@ package jan.schuettken.bierpongleague.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -33,8 +28,6 @@ import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.handler.ApiHandler;
 import jan.schuettken.bierpongleague.handler.PreferencesHandler;
 
-import static android.Manifest.permission.READ_CONTACTS;
-
 /**
  * A login screen that offers login via email/password.
  */
@@ -43,7 +36,6 @@ public class LoginActivity extends BasicPage {
     /**
      * Id to identity READ_CONTACTS permission request.
      */
-    private static final int REQUEST_READ_CONTACTS = 0;
     private static final int REQUEST_REGISTER = 1;
 
     /**
@@ -63,8 +55,6 @@ public class LoginActivity extends BasicPage {
         // Set up the login form.
         mUsernameView = findViewById(R.id.email);
         PreferencesHandler preferencesHandler = new PreferencesHandler(this);
-
-        populateAutoComplete();
 
         mPasswordView = findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -94,45 +84,6 @@ public class LoginActivity extends BasicPage {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-    }
-
-    private void populateAutoComplete() {
-//        if (!mayRequestContacts()) {
-//            return;
-//        }
-//
-//        getLoaderManager().initLoader(0, null, this);
-    }
-
-    private boolean mayRequestContacts() {
-        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(mUsernameView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok, new View.OnClickListener() {
-                        @Override
-                        @TargetApi(Build.VERSION_CODES.M)
-                        public void onClick(View v) {
-                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-                        }
-                    });
-        } else {
-            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-        }
-        return false;
-    }
-
-    /**
-     * Callback received when a permissions request has been completed.
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_READ_CONTACTS) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                populateAutoComplete();
-            }
-        }
     }
 
     public void register(View view) {
@@ -222,19 +173,15 @@ public class LoginActivity extends BasicPage {
                 try {
                     // Simulate network access.
                     Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    success = false;
+                } catch (InterruptedException ignored) {
                 }
                 try {
-                    apiHandler = new ApiHandler(username, password);
+                    apiHandler = new ApiHandler(username, password,LoginActivity.this);
                     //automatically logged in
                     success = true;
-                } catch (InvalidLoginException e) {
-                    //TODO error
-                    Log.e("LOGIN", "fail");
+                } catch (InvalidLoginException ignored) {
                 } catch (NoConnectionException | DatabaseException e) {
-                    //TODO no connection
-                    Log.e("LOGIN", "fail");
+                    showToast(R.string.no_internet_connection);
                 }
 
 

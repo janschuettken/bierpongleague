@@ -29,8 +29,7 @@ public class RegisterActivity extends BasicPage {
             ApiHandler apiHandler = new ApiHandler();
             try {
                 apiHandler.register(user);
-            } catch (NoConnectionException e) {
-                //TODO Try again Later
+            } catch (NoConnectionException ignored) {
             } catch (UsernameTakenException e) {
                 ((EditText) findViewById(R.id.username)).setError(getString(R.string.username_taken));
             }

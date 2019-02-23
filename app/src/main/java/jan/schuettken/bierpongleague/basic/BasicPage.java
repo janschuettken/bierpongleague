@@ -278,10 +278,9 @@ public class BasicPage extends AppCompatActivity implements PageInterfaceLarge {
             return apiHandler;
         } catch (EmptyPreferencesException e) {
             try {
-                apiHandler = new ApiHandler(preferencesHandler.getUsername(), preferencesHandler.getPassword());
+                apiHandler = new ApiHandler(preferencesHandler.getUsername(), preferencesHandler.getPassword(),this);
                 return apiHandler;
             } catch (NoConnectionException | DatabaseException e1) {
-                //TODO Try again Later
                 switchView(LoginActivity.class, true);
                 return null;
             } catch (InvalidLoginException | EmptyPreferencesException e1) {

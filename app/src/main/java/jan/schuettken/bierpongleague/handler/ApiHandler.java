@@ -1,5 +1,8 @@
 package jan.schuettken.bierpongleague.handler;
 
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -41,22 +44,37 @@ public class ApiHandler {
     }
 
     /**
-     * @param session Sets the session id<br>You can get one from: {@link #login(String, String) login}
+     * @param session Sets the session id<br>You can get one from: {@link #login(String, String, String) login}
      */
     public void setSession(@NonNull String session) {
         this.session = session;
     }
 
     /**
-     * For an description look at  {@link #login(String, String) login}
+     * For an description look at  {@link #login(String, String, String) login}
+     * @param context is used to get The Version Code from The App
      */
-    public ApiHandler(@NonNull String username, @NonNull String password) throws InvalidLoginException, NoConnectionException, DatabaseException {
+    public ApiHandler(@NonNull String username, @NonNull String password, @NonNull Context context) throws InvalidLoginException, NoConnectionException, DatabaseException {
         this();
-        login(username, password);
+        login(username, password,getVersionText(context));
+    }
+
+    private String getVersionText(@NonNull Context context){
+        PackageManager manager = context.getPackageManager();
+        String versionName;
+        try {
+            PackageInfo info = manager.getPackageInfo(context.getPackageName(), 0);
+            versionName = info.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            versionName = "unknown";
+        }
+
+        return versionName;
     }
 
     /**
-     * @param session A session id is required - if you have non use: {@link #ApiHandler(String, String) ApiHandler}
+     * @param session A session id is required - if you have non use: {@link #ApiHandler(String, String, Context) ApiHandler}
      */
     public ApiHandler(@NonNull String session) {
         this();
@@ -151,16 +169,17 @@ public class ApiHandler {
     }
 
     /**
-     * @param username the Username of the UserData
+     * @param username the username of the UserData
      * @param password the matching Password
+     * @param version the Version text of the app
      * @return true: the new SessionId is set in the {@link #getSession() session} Parameter of this class
      * @throws NoConnectionException Connection Timeout
      * @throws InvalidLoginException Password does not match the Username
      * @throws DatabaseException     Internal server error - maybe the server crashed?
      */
-    public boolean login(@NonNull String username, @NonNull String password)
+    public boolean login(@NonNull String username, @NonNull String password, @NonNull String version)
             throws NoConnectionException, InvalidLoginException, DatabaseException {
-        String fileUrl = SERVER_URL + "login.php?user=" + username + "&password=" + password;
+        String fileUrl = SERVER_URL + "login.php?user=" + username + "&password=" + password + "&version=Android " + version;
         //Log.e("LOGIN", fileUrl);
         String response = serverHandler.getJsonFromServer(fileUrl);
         //Log.e("LOGIN", response);
@@ -172,7 +191,6 @@ public class ApiHandler {
         session = response;
         return true;
     }
-
 
     /**
      * Registers a new User to the Game. Username and Email must be unique

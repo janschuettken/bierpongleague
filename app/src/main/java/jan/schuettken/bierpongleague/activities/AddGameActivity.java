@@ -21,14 +21,10 @@ import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.basic.BasicPage;
 import jan.schuettken.bierpongleague.data.GameData;
 import jan.schuettken.bierpongleague.data.UserData;
-import jan.schuettken.bierpongleague.exceptions.DatabaseException;
-import jan.schuettken.bierpongleague.exceptions.EmptyPreferencesException;
-import jan.schuettken.bierpongleague.exceptions.InvalidLoginException;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
 import jan.schuettken.bierpongleague.handler.ApiHandler;
 import jan.schuettken.bierpongleague.handler.DialogHandler;
-import jan.schuettken.bierpongleague.handler.PreferencesHandler;
 
 public class AddGameActivity extends BasicPage {
 
@@ -44,7 +40,8 @@ public class AddGameActivity extends BasicPage {
         new Thread() {
             @Override
             public void run() {
-                if (!checkApiHandler())
+                createApiHandler();
+                if (apiHandler == null)
                     finish();
                 createAutofill();
             }
@@ -169,27 +166,6 @@ public class AddGameActivity extends BasicPage {
         et_a.setEnabled(true);
     }
 
-    public boolean checkApiHandler() {
-        PreferencesHandler preferencesHandler = new PreferencesHandler(this);
-        try {
-            //get Session if available
-            apiHandler = new ApiHandler(preferencesHandler.getSessionId());
-            return true;
-        } catch (EmptyPreferencesException e) {
-            try {
-                apiHandler = new ApiHandler(preferencesHandler.getUsername(), preferencesHandler.getPassword());
-                return true;
-            } catch (NoConnectionException | DatabaseException e1) {
-                //TODO Try again Later
-                return false;
-            } catch (InvalidLoginException | EmptyPreferencesException e1) {
-                //You shouldn't be logged in
-                switchView(LoginActivity.class, true);
-                return false;
-            }
-        }
-    }
-
     private void createAutofill() {
         final List<UserData> autofillUser;
         try {
@@ -285,8 +261,6 @@ public class AddGameActivity extends BasicPage {
     }
 
     private boolean createGame() {
-        //TODO jeder user darf nut einmal auftauceh und alle felder müssen ausgefüllt sein
-
         int scoreA, scoreB;
         EditText et = findViewById(R.id.editText_score_team_a);
         try {

@@ -17,8 +17,6 @@ public class UserData implements Serializable {
     public final static int GENDER_WITH_PENIS = 0;
     public final static int GENDER_WITHOUT_PENIS = 1;
 
-    //TODO es fehlen noch einige Infos - UserData sollte den gesamten Datenbank Eintrag abbilden
-
     public UserData() {
 
     }

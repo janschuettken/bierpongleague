@@ -6,8 +6,8 @@ android {
         applicationId "jan.schuettken.bierpongleague"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 10
-        versionName "1.6 Beta"
+        versionCode 11
+        versionName "1.7 Beta"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

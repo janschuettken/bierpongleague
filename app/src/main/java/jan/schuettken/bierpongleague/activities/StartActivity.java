@@ -59,7 +59,7 @@ public class StartActivity extends BasicPage {
 
         try {
             assert username != null && password != null;
-            ApiHandler apiHandler = new ApiHandler(username, password);
+            ApiHandler apiHandler = new ApiHandler(username, password,this);
             prefHandler.setSessionId(apiHandler.getSession());
             switchView(OverviewActivity.class, true, handler);
 
