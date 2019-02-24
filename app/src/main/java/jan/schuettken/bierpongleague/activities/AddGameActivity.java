@@ -212,10 +212,15 @@ public class AddGameActivity extends BasicPage {
                 }
                 if (posInList > -1) {
                     game.getParticipants()[player] = autofillUser.get(posInList);
-                    if (checkUserForDuplicate(player)) {
+                    if (checkUserForDuplicate()) {
                         game.getParticipants()[player] = null;
                         textView.setText("");
                         textView.setError(getString(R.string.user_used));
+                    }
+                    if (checkForBadPlayer() && game.getParticipants()[0].getPower() < 50) {
+                        game.getParticipants()[player] = null;
+                        textView.setText("");
+                        textView.setError(getString(R.string.bad_user));
                     }
                 } else
                     throw new RuntimeException("User not in list - Internal Error");
@@ -225,7 +230,7 @@ public class AddGameActivity extends BasicPage {
         });
     }
 
-    private boolean checkUserForDuplicate(int lastChange) {
+    private boolean checkUserForDuplicate() {
         for (int i = 0; i < game.getParticipants().length; i++) {
             for (int n = 0; n < game.getParticipants().length; n++) {
                 if (i == n)
@@ -237,6 +242,20 @@ public class AddGameActivity extends BasicPage {
                     return true;
                 }
             }
+        }
+        return false;
+    }
+
+    private boolean checkForBadPlayer() {
+        for (int i = 0; i < game.getParticipants().length; i++) {
+            UserData user = game.getParticipant(i);
+            String name = user.getFirstName() + " " + user.getLastName();
+            if (name.equalsIgnoreCase("dummy account"))
+                return true;
+            if (name.equalsIgnoreCase("test test"))
+                return true;
+            if (name.equalsIgnoreCase("do not use"))
+                return true;
         }
         return false;
     }

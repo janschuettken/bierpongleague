@@ -20,6 +20,7 @@ import jan.schuettken.bierpongleague.data.UserData;
 import jan.schuettken.bierpongleague.exceptions.DatabaseException;
 import jan.schuettken.bierpongleague.exceptions.InvalidLoginException;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
+import jan.schuettken.bierpongleague.exceptions.NoGamesException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
 import jan.schuettken.bierpongleague.exceptions.UsernameTakenException;
 
@@ -52,14 +53,15 @@ public class ApiHandler {
 
     /**
      * For an description look at  {@link #login(String, String, String) login}
+     *
      * @param context is used to get The Version Code from The App
      */
     public ApiHandler(@NonNull String username, @NonNull String password, @NonNull Context context) throws InvalidLoginException, NoConnectionException, DatabaseException {
         this();
-        login(username, password,getVersionText(context));
+        login(username, password, getVersionText(context));
     }
 
-    private String getVersionText(@NonNull Context context){
+    private String getVersionText(@NonNull Context context) {
         PackageManager manager = context.getPackageManager();
         String versionName;
         try {
@@ -171,7 +173,7 @@ public class ApiHandler {
     /**
      * @param username the username of the UserData
      * @param password the matching Password
-     * @param version the Version text of the app
+     * @param version  the Version text of the app
      * @return true: the new SessionId is set in the {@link #getSession() session} Parameter of this class
      * @throws NoConnectionException Connection Timeout
      * @throws InvalidLoginException Password does not match the Username
@@ -230,7 +232,7 @@ public class ApiHandler {
      * @throws RuntimeException      in here the server response is stored
      */
     public List<GameData> getGames(@NonNull UserData user, boolean youAreInTeamOne)
-            throws NoConnectionException, SessionErrorException, RuntimeException, JSONException {
+            throws NoConnectionException, SessionErrorException, RuntimeException, JSONException, NoGamesException {
         return getGames(user.getId(), youAreInTeamOne);
     }
 
@@ -245,11 +247,12 @@ public class ApiHandler {
      */
     @NonNull
     public List<GameData> getGames(@IntRange(from = 0) int userId, boolean youAreInTeamOne)
-            throws SessionErrorException, NoConnectionException, RuntimeException, JSONException {
+            throws SessionErrorException, NoConnectionException, RuntimeException, JSONException, NoGamesException {
         String fileUrl = SERVER_URL + "getGame.php?session=" + session;
         fileUrl += "&userId=" + userId;
         String response = serverHandler.getJsonFromServer(fileUrl);
-
+        if (response == null)
+            throw new NoGamesException("No games played jet");
         if (response.equalsIgnoreCase("#fail#session error"))
             throw new SessionErrorException(response);
         if (response.startsWith("#fail#"))

@@ -14,6 +14,7 @@ public class UserData implements Serializable {
     private double elo;
     private String username, firstName, lastName, nickName, password, email;
     private int gender;
+    private int power = 0;
     public final static int GENDER_WITH_PENIS = 0;
     public final static int GENDER_WITHOUT_PENIS = 1;
 
@@ -25,6 +26,10 @@ public class UserData implements Serializable {
         setId(userData.getInt("Id"));
         try {
             setUsername(userData.getString("Username"));
+        } catch (Exception ignored) {
+        }
+        try {
+            power = (userData.getInt("Power"));
         } catch (Exception ignored) {
         }
         setFirstName(userData.getString("FirstName"));
@@ -104,6 +109,14 @@ public class UserData implements Serializable {
         return gender;
     }
 
+    public boolean isWithPenis() {
+        return getGender() == GENDER_WITH_PENIS;
+    }
+
+    public boolean isWithoutPenis() {
+        return getGender() == GENDER_WITHOUT_PENIS;
+    }
+
     public void setGender(int gender) {
         this.gender = gender;
     }
@@ -113,5 +126,9 @@ public class UserData implements Serializable {
         if (!(obj instanceof UserData))
             return false;
         return this.getFullName().equals(((UserData) obj).getFullName());
+    }
+
+    public int getPower() {
+        return power;
     }
 }

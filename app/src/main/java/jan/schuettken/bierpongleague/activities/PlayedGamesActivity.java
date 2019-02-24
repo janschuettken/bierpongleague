@@ -19,6 +19,7 @@ import jan.schuettken.bierpongleague.custom.GameRecyclerListAdapter;
 import jan.schuettken.bierpongleague.custom.SimpleItemTouchHelperCallback;
 import jan.schuettken.bierpongleague.data.GameData;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
+import jan.schuettken.bierpongleague.exceptions.NoGamesException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
 import jan.schuettken.bierpongleague.handler.ApiHandler;
 
@@ -110,7 +111,7 @@ public class PlayedGamesActivity extends BasicDrawerPage {
                         }
                     });
 
-                } catch (NoConnectionException | SessionErrorException | JSONException e) {
+                } catch (NoConnectionException | SessionErrorException | JSONException | NoGamesException e) {
                     //no games are played
                     handler.post(new Runnable() {
                         @Override

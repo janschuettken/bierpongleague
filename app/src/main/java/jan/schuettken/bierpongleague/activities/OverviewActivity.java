@@ -32,6 +32,7 @@ import jan.schuettken.bierpongleague.custom.MyOnChartValueSelectedListener;
 import jan.schuettken.bierpongleague.data.GameData;
 import jan.schuettken.bierpongleague.data.UserData;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
+import jan.schuettken.bierpongleague.exceptions.NoGamesException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
 import jan.schuettken.bierpongleague.handler.ApiHandler;
 import jan.schuettken.bierpongleague.handler.ColorFunctionProvider;
@@ -232,7 +233,7 @@ public class OverviewActivity extends BasicDrawerPage {
 
                         }
                     });
-                } catch (NoConnectionException | SessionErrorException | JSONException e) {
+                } catch (NoConnectionException | SessionErrorException | JSONException | NoGamesException e) {
                     initializeBeersDrunk(null);
                     handler.post(new Runnable() {
                         @Override
