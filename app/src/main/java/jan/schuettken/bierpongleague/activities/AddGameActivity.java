@@ -37,6 +37,7 @@ public class AddGameActivity extends BasicPage {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_game);
         handler = new Handler();
+        apiHandler = createApiHandler();
         new Thread() {
             @Override
             public void run() {
