@@ -47,14 +47,9 @@ public class EloTrendActivity extends BasicDrawerPage {
         Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.elo_trend);
 
         handler = new Handler();
-        checkApiHandler();
-
-        initializeLineChart();
-    }
-
-    private boolean checkApiHandler() {
         apiHandler = createApiHandler();
-        return apiHandler != null;
+        if (apiHandler != null)
+            initializeLineChart();
     }
 
     @Override
