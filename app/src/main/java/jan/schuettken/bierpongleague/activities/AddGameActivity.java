@@ -180,9 +180,9 @@ public class AddGameActivity extends BasicPage {
                     textView.setEnabled(false);
                     textView.setText(you.getFirstName() + " " + you.getLastName());
                     game.getParticipants()[0] = you;
-                    setAutofill(1, R.id.editText_player_b, autofillUser);
-                    setAutofill(2, R.id.editText_player_c, autofillUser);
-                    setAutofill(3, R.id.editText_player_d, autofillUser);
+                    setAutoComplete(1, R.id.editText_player_b, autofillUser);
+                    setAutoComplete(2, R.id.editText_player_c, autofillUser);
+                    setAutoComplete(3, R.id.editText_player_d, autofillUser);
                 }
             });
 
@@ -192,11 +192,11 @@ public class AddGameActivity extends BasicPage {
         }
     }
 
-    private void setAutofill(final int player, int id, final List<UserData> autofillUser) {
+    private void setAutoComplete(final int player, int id, final List<UserData> autoCompleteUser) {
         final AutoCompleteTextView textView = findViewById(id);
-        String[] userNames = new String[autofillUser.size()];
+        String[] userNames = new String[autoCompleteUser.size()];
         for (int i = 0; i < userNames.length; i++)
-            userNames[i] = autofillUser.get(i).getFirstName() + " " + autofillUser.get(i).getLastName();
+            userNames[i] = autoCompleteUser.get(i).getFirstName() + " " + autoCompleteUser.get(i).getLastName();
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, userNames);
         textView.setAdapter(adapter);
@@ -204,14 +204,14 @@ public class AddGameActivity extends BasicPage {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 int posInList = -1;
-                for (int i = 0; i < autofillUser.size(); i++) {
-                    if (textView.getText().toString().equals(autofillUser.get(i).getFirstName() + " " + autofillUser.get(i).getLastName())) {
+                for (int i = 0; i < autoCompleteUser.size(); i++) {
+                    if (textView.getText().toString().equals(autoCompleteUser.get(i).getFirstName() + " " + autoCompleteUser.get(i).getLastName())) {
                         posInList = i;
                         break;
                     }
                 }
                 if (posInList > -1) {
-                    game.getParticipants()[player] = autofillUser.get(posInList);
+                    game.getParticipants()[player] = autoCompleteUser.get(posInList);
                     if (checkUserForDuplicate()) {
                         game.getParticipants()[player] = null;
                         textView.setText("");
@@ -249,13 +249,15 @@ public class AddGameActivity extends BasicPage {
     private boolean checkForBadPlayer() {
         for (int i = 0; i < game.getParticipants().length; i++) {
             UserData user = game.getParticipant(i);
-            String name = user.getFirstName() + " " + user.getLastName();
-            if (name.equalsIgnoreCase("dummy account"))
-                return true;
-            if (name.equalsIgnoreCase("test test"))
-                return true;
-            if (name.equalsIgnoreCase("do not use"))
-                return true;
+            if (user != null && user.isSet()) {
+                String name = user.getFirstName() + " " + user.getLastName();
+                if (name.equalsIgnoreCase("dummy account"))
+                    return true;
+                if (name.equalsIgnoreCase("test test"))
+                    return true;
+                if (name.equalsIgnoreCase("do not use"))
+                    return true;
+            }
         }
         return false;
     }

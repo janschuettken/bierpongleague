@@ -131,4 +131,13 @@ public class UserData implements Serializable {
     public int getPower() {
         return power;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + "#" + getFirstName();
+    }
+
+    public boolean isSet() {
+        return !(getFirstName() == null && getLastName() == null && getUsername() == null);
+    }
 }
