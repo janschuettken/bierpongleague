@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
+import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
+
 /**
  * Created by Jan on 06.06.2017.
  */
@@ -31,7 +33,7 @@ class AsyncServerTaskExtends extends AsyncTask<String, Integer, String> {
         super.onPostExecute(s);
     }
 
-    private String getJsonFromServer(String url) {
+    private String getJsonFromServer(String url) throws NoConnectionException {
         try {
             BufferedReader inputStream;
 
@@ -44,7 +46,7 @@ class AsyncServerTaskExtends extends AsyncTask<String, Integer, String> {
             return inputStream.readLine();
         } catch (Exception e) {
             e.printStackTrace();
-            return "#fail#-no-connection";
+            throw new NoConnectionException();
         }
     }
 }

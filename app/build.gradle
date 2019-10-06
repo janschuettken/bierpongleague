@@ -6,8 +6,8 @@ android {
         applicationId "jan.schuettken.bierpongleague"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 14
-        versionName "1.10 Beta"
+        versionCode 15
+        versionName "1.11 Beta"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -15,6 +15,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
     }
 }
 

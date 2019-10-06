@@ -18,10 +18,12 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.activities.LoginActivity;
 import jan.schuettken.bierpongleague.activities.PlayedGamesActivity;
+import jan.schuettken.bierpongleague.data.AreaData;
 import jan.schuettken.bierpongleague.data.GameData;
 import jan.schuettken.bierpongleague.data.UserData;
 import jan.schuettken.bierpongleague.exceptions.DatabaseException;
@@ -38,7 +40,8 @@ import jan.schuettken.bierpongleague.handler.PreferencesHandler;
 
 public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder> implements ItemTouchHelperAdapter {
 
-    private LinkedList<GameData> items = new LinkedList<>();
+    private List<GameData> items = new LinkedList<>();
+    private List<AreaData> areas = new LinkedList<>();
     private ListAction action;
     private PlayedGamesActivity context;
     private View view;
@@ -79,11 +82,11 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
         this.currentUser = currentUser;
     }
 
-    public LinkedList<GameData> getItems() {
+    public List<GameData> getItems() {
         return items;
     }
 
-    public void setItems(LinkedList<GameData> items) {
+    public void setItems(List<GameData> items) {
         this.items = items;
     }
 
@@ -107,14 +110,19 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
         date = vi.findViewById(R.id.text_game_date);
         @SuppressLint("SimpleDateFormat")
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-        if (game.getDate() != null)
-            date.setText(format.format(game.getDate()));
-        else
+        if (game.getDate() != null) {
+            StringBuilder head = new StringBuilder(format.format(game.getDate()));
+            head.append(" @");
+            for (AreaData ad : areas)
+                if (ad.getId() == game.getAreaId())
+                    head.append(ad.getName());
+            date.setText(head.toString());
+        } else
             date.setText("Date Error");
-        setPlayerText((TextView) vi.findViewById(R.id.name_player_first_name), (TextView) vi.findViewById(R.id.name_player_last_name), game, 0);
-        setPlayerText((TextView) vi.findViewById(R.id.name_player_b_first_name), (TextView) vi.findViewById(R.id.name_player_b_last_name), game, 1);
-        setPlayerText((TextView) vi.findViewById(R.id.name_player_c_first_name), (TextView) vi.findViewById(R.id.name_player_c_last_name), game, 2);
-        setPlayerText((TextView) vi.findViewById(R.id.name_player_d_first_name), (TextView) vi.findViewById(R.id.name_player_d_last_name), game, 3);
+        setPlayerText(vi.findViewById(R.id.name_player_first_name), vi.findViewById(R.id.name_player_last_name), game, 0);
+        setPlayerText(vi.findViewById(R.id.name_player_b_first_name), vi.findViewById(R.id.name_player_b_last_name), game, 1);
+        setPlayerText(vi.findViewById(R.id.name_player_c_first_name), vi.findViewById(R.id.name_player_c_last_name), game, 2);
+        setPlayerText(vi.findViewById(R.id.name_player_d_first_name), vi.findViewById(R.id.name_player_d_last_name), game, 3);
 //        player = vi.findViewById(R.id.name_player_first_name);
 //        player.setText(game.getParticipant(0).getFirstName());
 //        player.setTextColor(context.getColor(R.color.colorGrey));
@@ -169,19 +177,9 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
         else {
             vi.findViewById(R.id.region_confirmGame).setVisibility(View.VISIBLE);
             Button right = vi.findViewById(R.id.button_confirm_yes);
-            right.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    confirmGame(game.getGameId(), true);
-                }
-            });
+            right.setOnClickListener(v -> confirmGame(game.getGameId(), true));
             Button wrong = vi.findViewById(R.id.button_confirm_no);
-            wrong.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    confirmGame(game.getGameId(), false);
-                }
-            });
+            wrong.setOnClickListener(v -> confirmGame(game.getGameId(), false));
         }
     }
 
@@ -241,23 +239,15 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
     }
 
     private void showConfirmInfoAndReload(Handler handler) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                context.showToast(R.string.game_confirmed);
-                showProgress(false);
-                context.loadGames();
-            }
+        handler.post(() -> {
+            context.showToast(R.string.game_confirmed);
+            showProgress(false);
+            context.loadGames();
         });
     }
 
     private void showProgress(final boolean show, Handler handler) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                showProgress(show);
-            }
-        });
+        handler.post(() -> showProgress(show));
     }
 
     private void showProgress(final boolean show) {
@@ -302,6 +292,14 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
 
     public void scroll(int index) {
 
+    }
+
+    public List<AreaData> getAreas() {
+        return areas;
+    }
+
+    public void setAreas(List<AreaData> areas) {
+        this.areas = areas;
     }
 }
 

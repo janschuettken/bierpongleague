@@ -34,6 +34,7 @@ import jan.schuettken.bierpongleague.activities.AddGameActivity;
 import jan.schuettken.bierpongleague.activities.ConfirmActivity;
 import jan.schuettken.bierpongleague.activities.EloTrendActivity;
 import jan.schuettken.bierpongleague.activities.LoginActivity;
+import jan.schuettken.bierpongleague.activities.MyAreasActivity;
 import jan.schuettken.bierpongleague.activities.OverviewActivity;
 import jan.schuettken.bierpongleague.activities.PlayedGamesActivity;
 import jan.schuettken.bierpongleague.activities.ScoreboardActivity;
@@ -49,7 +50,6 @@ import jan.schuettken.bierpongleague.handler.PreferencesHandler;
  */
 public abstract class BasicDrawerPage extends BasicPage implements NavigationView.OnNavigationItemSelectedListener {
 
-    public final static String CURRENT_USER = "CURRENT_USER";
     protected UserData currentUser = null;
     private LineDataSet lineDataSetPreview;
     private LineChart lineChartPreview;
@@ -92,12 +92,7 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
         elo.setText(getResString(R.string.your_elo, (int) currentUser.getElo()));
 
         //set up the add ne game FAB
-        findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                switchView(AddGameActivity.class);
-            }
-        });
+        findViewById(R.id.fab).setOnClickListener(view -> switchView(AddGameActivity.class));
 
         handler = new Handler();
         apiHandler = createApiHandler();
@@ -145,6 +140,11 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
                     switchView(ScoreboardActivity.class, true, new Portable(CURRENT_USER, currentUser));
                 }
                 break;
+            case R.id.nav_area:
+                if (!(this instanceof MyAreasActivity)) {
+                    switchView(MyAreasActivity.class, true, new Portable(CURRENT_USER, currentUser));
+                }
+                break;
             case R.id.nav_share:
                 shareApp();
                 break;
@@ -161,7 +161,7 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
         return true;
     }
 
-    private void logout(){
+    private void logout() {
         PreferencesHandler preferencesHandler = new PreferencesHandler(this);
         preferencesHandler.setPassword("");
         preferencesHandler.setUsername("");
@@ -255,60 +255,48 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
         refreshLineChart(head);
     }
 
+    @SuppressLint("SetTextI18n")
     private void refreshLineChart(final View head) {
 
-        new Thread() {
-            @Override
-            public void run() {
+        new Thread(() -> {
 
-                try {
-                    List<EloData> elos = apiHandler.getEloPreview();
-                    if (elos != null) {
-                        final List<Entry> lineEntries = new ArrayList<>();
-                        final double startElo = elos.get(0).getValue(), endElo = elos.get(elos.size() - 1).getValue();
-                        for (int i = 0; i < elos.size(); i++) {
-                            lineEntries.add(new Entry(i + 1, (float) elos.get(i).getValue()));
-                        }
-                        if (lineEntries.isEmpty()) {
-                            lineEntries.add(new Entry(1, 0));
-                        }
-                        if (!lineEntries.isEmpty()) {
-                            lineDataSetPreview.clear();
-                            for (Entry e : lineEntries)
-                                lineDataSetPreview.addEntry(e);
-                            LineData lineData = new LineData(lineDataSetPreview);
-
-                            lineChartPreview.setData(lineData);
-
-                            handler.post(new Runnable() {
-                                @SuppressLint("SetTextI18n")
-                                @Override
-                                public void run() {
-                                    lineChartPreview.invalidate();
-                                    TextView tv = head.findViewById(R.id.eloPreviewText);
-                                    int diff = (int) (endElo - startElo);
-                                    String prefix = "↑";
-                                    tv.setTextColor(getColor(R.color.colorGreenLight));
-                                    if (diff < 0) {
-                                        prefix = "↓";
-                                        tv.setTextColor(getColor(R.color.colorRedLight));
-                                    }
-                                    tv.setText(prefix + Math.abs(diff));
-
-                                }
-                            });
-                        }
+            try {
+                List<EloData> elos = apiHandler.getEloPreview();
+                if (elos != null) {
+                    final List<Entry> lineEntries = new ArrayList<>();
+                    final double startElo = elos.get(0).getValue(), endElo = elos.get(elos.size() - 1).getValue();
+                    for (int i = 0; i < elos.size(); i++) {
+                        lineEntries.add(new Entry(i + 1, (float) elos.get(i).getValue()));
                     }
-                } catch (JSONException | SessionErrorException |
-                        NoConnectionException e) {
-                    e.printStackTrace();
+                    if (lineEntries.isEmpty()) {
+                        lineEntries.add(new Entry(1, 0));
+                    }
+                    if (!lineEntries.isEmpty()) {
+                        lineDataSetPreview.clear();
+                        for (Entry e : lineEntries)
+                            lineDataSetPreview.addEntry(e);
+                        LineData lineData = new LineData(lineDataSetPreview);
+
+                        lineChartPreview.setData(lineData);
+
+                        handler.post(() -> {
+                            lineChartPreview.invalidate();
+                            TextView tv = head.findViewById(R.id.eloPreviewText);
+                            int diff = (int) (endElo - startElo);
+                            String prefix = "↑";
+                            tv.setTextColor(getColor(R.color.colorGreenLight));
+                            if (diff < 0) {
+                                prefix = "↓";
+                                tv.setTextColor(getColor(R.color.colorRedLight));
+                            }
+                            tv.setText(prefix + Math.abs(diff));
+                        });
+                    }
                 }
+            } catch (JSONException | SessionErrorException |
+                    NoConnectionException e) {
+                e.printStackTrace();
             }
-        }.
-
-                start();
-
-
+        }).start();
     }
-
 }

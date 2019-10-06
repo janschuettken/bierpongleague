@@ -1,4 +1,8 @@
 <resources>
+    <array name="gender">
+        <item>Mit Pimmel</item>
+        <item>Mit ohne Pimmel</item>
+    </array>
     <string name="app_name"><b>BEERPONG</b><i>league</i></string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -10,8 +14,8 @@
     <string name="league">league</string>
     <string name="played_games">Gespielte Spiele</string>
     <string name="title_activity_login">Anmelden</string>
-    <string name="title_activity_add_game">Neues Spiel</string>
     <!-- Strings related to login -->
+    <string name="title_activity_add_game">Neues Spiel</string>
     <string name="prompt_username">Username</string>
     <string name="prompt_password">Passwort</string>
     <string name="action_sign_in">Anmelden</string>
@@ -54,10 +58,6 @@
     <string name="game_confirmed">Spiel bestätigt</string>
     <string name="user_used">Du kannst jede Person nur einmal pro Spiel verwenden!</string>
     <string name="username_taken">Benutzername bereits benutzt</string>
-    <array name="gender">
-        <item>Mit Pimmel</item>
-        <item>Mit ohne Pimmel</item>
-    </array>
     <string name="won_games">Gewonnene Spiele</string>
     <string name="lost_games">Verlorene Spiele</string>
     <string name="statistics">Statistiken</string>
@@ -68,13 +68,38 @@
     <string name="scoreboard">Scoreboard</string>
     <string name="max_elo_all_time">Höchster Elo Wert</string>
     <string name="min_elo_all_time">Niedrigster Elo Wert</string>
-    <string name="beers_drunk_all_time">Du hast bereits %1$d Liter Bier getrunken.</string>
+    <string name="beers_drunk_all_time" translatable="false">Du hast bereits %1$d Liter Bier getrunken.</string>
     <string name="more">Mehr</string>
     <string name="share">Teilen</string>
     <string name="logout">Logout</string>
     <string name="text_share">*Beerpong League* <br /> Messe dich mit anderen Beerpong Spielern in einem Rang System<br /> https://play.google.com/store/apps/details?id=jan.schuettken.bierpongleague</string>
-    <string name="no_games_played_jet">Du hast bis jetzt noch keine Spiele Gespielt. <br />Drücke auf das <b>+</b> um ein neues Spiel einzutragen</string>
+    <string name="no_games_played_jet">Du hast bis jetzt noch keine Spiele Gespielt. <b>+</b>Drücke auf das <br /> um ein neues Spiel einzutragen</string>
     <string name="app_version">Version</string>
     <string name="show_version">Version: %1$s (Build %2$d)</string>
     <string name="bad_user">Diesen Spieler darfst du nicht verwenden!</string>
+    <string name="select_area">In welcher Liga spielst du gerade?</string>
+    <string name="name_of_area">Name der Liga</string>
+    <string name="add_area">Liga hinzufügen</string>
+    <string name="area">Liga</string>
+    <string name="area_added">Liga hinzugefügt</string>
+    <string name="private_area">Private Liga</string>
+    <string name="private_area_info">In dieser Liga können nur Leute spielen, welche zuvor bestätigt wurden.</string>
+    <string name="public_area">Öffentliche Liga</string>
+    <string name="public_area_info">In dieser Liga kann jeder spielen. Sie ist auch für jeden sichtbar</string>
+    <string name="info">Info</string>
+    <string name="my_areas">Meine Ligen</string>
+    <string name="error">Fehler</string>
+    <string name="user_not_in_area">Es müssen alle Mitspieler auch in der gewünschten Liga sein</string>
+    <string name="save_changes">Änderungen speichern</string>
+    <string name="name_of_user">Names des neuen Spielers</string>
+    <string name="add_player">Spieler hinzufügen</string>
+    <string name="player_added">Spieler hinzugefügt</string>
+    <string name="must_be_admin">Du musst Admin sein</string>
+    <string name="user_already_in_area">Dieser Spieler ist bereits der Liga beigetreten</string>
+    <string name="enter_area_code">Gib den Liga Code ein um einer bestehenden Liga bezutreten. Den Code erhalst du von dem Ersteller der Liga</string>
+    <string name="join_area">Liga beitreten</string>
+    <string name="no_code_entered">Kein Code eingegeben</string>
+    <string name="area_code">Liga Freigabecode</string>
+    <string name="area_code_hint">Dieser Code kann verteilt werden. Um dieser Area beizutreten.</string>
+    <string name="saved_to_clipboard">Text kopiert</string>
 </resources>

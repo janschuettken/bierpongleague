@@ -7,4 +7,8 @@ public class NoConnectionException extends Exception {
     public NoConnectionException(String errorText) {
         super(errorText);
     }
+
+    public NoConnectionException() {
+        super();
+    }
 }

@@ -6,6 +6,7 @@ import android.util.Log;
 
 import java.util.Map;
 
+import jan.schuettken.bierpongleague.data.AreaData;
 import jan.schuettken.bierpongleague.exceptions.EmptyPreferencesException;
 
 /**
@@ -22,6 +23,7 @@ public class PreferencesHandler {
     public final static String PASSWORD_PREF = "password";
     public final static String USER_ID_PREF = "userId";
     public final static String SESSION_PREF = "sessionId";
+    public final static String LAST_AREA_PREF = "lastArea";
     public final static String SESSION_TIME_PREF = "sessionTime";//store the timestamp of the last session request > 5 min del session
     private final static int LOGOUT_TIME = 5 * 1000;//5 min in ms
 
@@ -56,9 +58,15 @@ public class PreferencesHandler {
     }
 
     public String getSessionId() throws EmptyPreferencesException {
+        boolean empty = false;
+        long timestamp = 0;
+        try {
+            timestamp = getDataFromPrefsLong(SESSION_TIME_PREF);
 
-        long timestamp = getDataFromPrefsLong(SESSION_TIME_PREF, Long.MIN_VALUE);
-        if (timestamp == Long.MIN_VALUE || (System.currentTimeMillis() - timestamp) > LOGOUT_TIME) {
+        } catch (EmptyPreferencesException e) {
+            empty = true;
+        }
+        if (empty || (System.currentTimeMillis() - timestamp) > LOGOUT_TIME) {
             deletePrefData(SESSION_PREF);
             deletePrefData(SESSION_TIME_PREF);
             throw new EmptyPreferencesException("Session timeout");
@@ -70,6 +78,16 @@ public class PreferencesHandler {
         saveDataToPrefs(SESSION_PREF, sessionId);
         saveDataToPrefs(SESSION_TIME_PREF, System.currentTimeMillis());
     }
+
+    public int getLastArea() throws EmptyPreferencesException {
+        return (int) getDataFromPrefsLong(LAST_AREA_PREF);
+    }
+
+    public boolean setLastArea(AreaData areaData) {
+        return saveDataToPrefs(LAST_AREA_PREF, areaData.getId());
+    }
+
+
 //REGION ############# pref basic functions
 
     private String getPrefWithException(String pref) throws EmptyPreferencesException {
@@ -148,8 +166,29 @@ public class PreferencesHandler {
         try {
             return prefs.getString(pref, empty);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Error while reading from prefs: " + pref);
         }
+    }
+
+    /**
+     * @param pref the pref to read out
+     * @return tries to parse an int to return.<br>
+     * EmptyPreferencesException If Pref exists but it's empty
+     */
+    private long getDataFromPrefsLong(String pref) throws RuntimeException, EmptyPreferencesException {
+        if (context == null)
+            throw new RuntimeException("context is null");
+        checkForPref();
+        long back;
+        try {
+            back = prefs.getLong(pref, Long.MIN_VALUE);
+        } catch (Exception e) {
+            throw new RuntimeException("Error while reading from prefs: " + pref);
+        }
+        if (back == Long.MIN_VALUE)
+            throw new EmptyPreferencesException(pref);
+        return back;
     }
 
     /**
@@ -178,30 +217,10 @@ public class PreferencesHandler {
         }
     }
 
-    /**
-     * @param pref the pref to read out
-     * @return tries to parse an int to return. If not it will return Integer.MIN_VALUE
-     */
-    private int getDataFromPrefsInt(String pref) {
-        try {
-            return Integer.parseInt(getDataFromPrefs(pref));
-        } catch (Exception e) {
-            return Integer.MIN_VALUE;
-        }
-    }
-
-    private long getDataFromPrefsLong(String pref, long defaultState) {
-        try {
-            return Long.parseLong(getDataFromPrefs(pref));
-        } catch (Exception e) {
-            return defaultState;
-        }
-    }
-
-    private void printAllPrefs() {
+    public void printAllPrefs() {
         Map<String, ?> allEntries = prefs.getAll();
         for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-            Log.e("map values", entry.getKey() + ": " + entry.getValue().toString());
+            Log.e("map values", entry.getKey() + ": " + entry.getValue().toString() + " # " + entry.getValue().getClass());
         }
     }
 

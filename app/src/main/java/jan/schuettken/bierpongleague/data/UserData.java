@@ -41,8 +41,9 @@ public class UserData implements Serializable {
         return id;
     }
 
-    public void setId(int id) {
+    public UserData setId(int id) {
         this.id = id;
+        return this;
     }
 
     public String getUsername() {

@@ -17,6 +17,7 @@ import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.basic.BasicDrawerPage;
 import jan.schuettken.bierpongleague.custom.GameRecyclerListAdapter;
 import jan.schuettken.bierpongleague.custom.SimpleItemTouchHelperCallback;
+import jan.schuettken.bierpongleague.data.AreaData;
 import jan.schuettken.bierpongleague.data.GameData;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.exceptions.NoGamesException;
@@ -45,13 +46,8 @@ public class PlayedGamesActivity extends BasicDrawerPage {
         swipeContainer = findViewById(R.id.swipeContainer);
 
         // Setup refresh listener which triggers new data loading
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loadGames();
-                //swipeContainer.setRefreshing(false);
-            }
-        });
+        //swipeContainer.setRefreshing(false);
+        swipeContainer.setOnRefreshListener(this::loadGames);
     }
 
     private void initializeList() {
@@ -93,45 +89,32 @@ public class PlayedGamesActivity extends BasicDrawerPage {
 
     public void loadGames() {
         swipeContainer.setRefreshing(true);
-        new Thread() {
-            @Override
-            public void run() {
-                if (!checkApiHandler())
-                    return;
-                try {
-                    final List<GameData> games = apiHandler.getGames(apiHandler.getYourself(), true);
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            findViewById(R.id.no_games_played_warning).setVisibility(View.GONE);
-                            recyclerList.getItems().clear();
-                            recyclerList.getItems().addAll(games);
-                            templateList.setAdapter(recyclerList);
-                            swipeContainer.setRefreshing(false);
-                        }
-                    });
+        new Thread(() -> {
+            if (!checkApiHandler())
+                return;
+            try {
+                final List<AreaData> areas = apiHandler.getAreas();
+                final List<GameData> games = apiHandler.getGames(apiHandler.getYourself(), true);
+                handler.post(() -> {
+                    findViewById(R.id.no_games_played_warning).setVisibility(View.GONE);
+                    recyclerList.setAreas(areas);
+                    recyclerList.getItems().clear();
+                    recyclerList.getItems().addAll(games);
+                    templateList.setAdapter(recyclerList);
+                    swipeContainer.setRefreshing(false);
+                });
 
-                } catch (NoConnectionException | SessionErrorException | JSONException | NoGamesException e) {
-                    //no games are played
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            findViewById(R.id.no_games_played_warning).setVisibility(View.VISIBLE);
-                            swipeContainer.setRefreshing(false);
-                        }
-                    });
-
-                }
+            } catch (NoConnectionException | SessionErrorException | JSONException | NoGamesException e) {
+                //no games are played
+                handler.post(() -> {
+                    findViewById(R.id.no_games_played_warning).setVisibility(View.VISIBLE);
+                    swipeContainer.setRefreshing(false);
+                });
             }
-        }.start();
+        }).start();
     }
 
     private void setRefreshing(final boolean refresh) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                swipeContainer.setRefreshing(refresh);
-            }
-        });
+        handler.post(() -> swipeContainer.setRefreshing(refresh));
     }
 }

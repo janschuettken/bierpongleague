@@ -4,11 +4,14 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Toast;
 
@@ -35,6 +38,8 @@ public class BasicPage extends AppCompatActivity implements PageInterfaceLarge {
     public static final int REQUEST_DOWNLOAD_ENTRIES = 3;
     public static final int REQUEST_PASSWORD = 4;
     public static final int RESULT_DELETED = 10;
+    public static final String PASS_AREA = "PASS_AREA";
+    public final static String CURRENT_USER = "CURRENT_USER";
 
     @Override
     public void switchView(Class<?> o) {
@@ -47,12 +52,7 @@ public class BasicPage extends AppCompatActivity implements PageInterfaceLarge {
     }
 
     public void switchView(final Class<?> o, final boolean finish, Handler handler) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                switchView(o, finish, false);
-            }
-        });
+        handler.post(() -> switchView(o, finish, false));
     }
 
     public boolean switchView(String packageName, String className) {
@@ -206,12 +206,7 @@ public class BasicPage extends AppCompatActivity implements PageInterfaceLarge {
     }
 
     public void showToast(final int id, Handler handler) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                showToast(BasicPage.this.getResources().getString(id));
-            }
-        });
+        handler.post(() -> showToast(BasicPage.this.getResources().getString(id)));
     }
 
     public void showToast(int id, Object... res) {
@@ -261,12 +256,7 @@ public class BasicPage extends AppCompatActivity implements PageInterfaceLarge {
     }
 
     public void finish(Handler handler) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                finish();
-            }
-        });
+        handler.post(this::finish);
     }
 
     public ApiHandler createApiHandler() {
@@ -278,7 +268,7 @@ public class BasicPage extends AppCompatActivity implements PageInterfaceLarge {
             return apiHandler;
         } catch (EmptyPreferencesException e) {
             try {
-                apiHandler = new ApiHandler(preferencesHandler.getUsername(), preferencesHandler.getPassword(),this);
+                apiHandler = new ApiHandler(preferencesHandler.getUsername(), preferencesHandler.getPassword(), this);
                 return apiHandler;
             } catch (NoConnectionException | DatabaseException e1) {
                 switchView(LoginActivity.class, true);
@@ -287,6 +277,18 @@ public class BasicPage extends AppCompatActivity implements PageInterfaceLarge {
                 //You shouldn't be logged in
                 switchView(LoginActivity.class, true);
                 return null;
+            }
+        }
+    }
+
+    protected void changeMenuColorToWhite(Menu menu) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            for (int i = 0; i < menu.size(); i++) {
+                Drawable drawable = menu.getItem(i).getIcon();
+                if (drawable != null) {
+                    drawable.mutate();
+                    drawable.setColorFilter(getResources().getColor(android.R.color.white, null), PorterDuff.Mode.SRC_ATOP);
+                }
             }
         }
     }

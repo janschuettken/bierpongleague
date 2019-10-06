@@ -12,25 +12,32 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 
 import org.json.JSONException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.basic.BasicPage;
+import jan.schuettken.bierpongleague.data.AreaData;
 import jan.schuettken.bierpongleague.data.GameData;
 import jan.schuettken.bierpongleague.data.UserData;
+import jan.schuettken.bierpongleague.exceptions.EmptyPreferencesException;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
+import jan.schuettken.bierpongleague.exceptions.UserNotInAreaException;
 import jan.schuettken.bierpongleague.handler.ApiHandler;
 import jan.schuettken.bierpongleague.handler.DialogHandler;
+import jan.schuettken.bierpongleague.handler.PreferencesHandler;
 
 public class AddGameActivity extends BasicPage {
 
     private ApiHandler apiHandler;
     private Handler handler;
     private GameData game = new GameData(false);
+    private List<AreaData> areas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,15 +45,13 @@ public class AddGameActivity extends BasicPage {
         setContentView(R.layout.activity_add_game);
         handler = new Handler();
         apiHandler = createApiHandler();
-        new Thread() {
-            @Override
-            public void run() {
-                createApiHandler();
-                if (apiHandler == null)
-                    finish();
-                createAutofill();
-            }
-        }.start();
+        new Thread(() -> {
+            createApiHandler();
+            if (apiHandler == null)
+                finish();
+            createAutofill();
+            loadAreas();
+        }).start();
 
         final EditText et_a = findViewById(R.id.editText_score_team_a);
         final EditText et_b = findViewById(R.id.editText_score_team_b);
@@ -172,23 +177,64 @@ public class AddGameActivity extends BasicPage {
         try {
             final UserData you = apiHandler.getYourself();
             autofillUser = apiHandler.getUser();
-            handler.post(new Runnable() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void run() {
-                    AutoCompleteTextView textView = findViewById(R.id.editText_player_a);
-                    textView.setEnabled(false);
-                    textView.setText(you.getFirstName() + " " + you.getLastName());
-                    game.getParticipants()[0] = you;
-                    setAutoComplete(1, R.id.editText_player_b, autofillUser);
-                    setAutoComplete(2, R.id.editText_player_c, autofillUser);
-                    setAutoComplete(3, R.id.editText_player_d, autofillUser);
-                }
+            handler.post(() -> {
+                AutoCompleteTextView textView = findViewById(R.id.editText_player_a);
+                textView.setEnabled(false);
+                textView.setText(you.getFirstName() + " " + you.getLastName());
+                game.getParticipants()[0] = you;
+                setAutoComplete(1, R.id.editText_player_b, autofillUser);
+                setAutoComplete(2, R.id.editText_player_c, autofillUser);
+                setAutoComplete(3, R.id.editText_player_d, autofillUser);
             });
 
         } catch (JSONException | SessionErrorException | NoConnectionException e) {
             e.printStackTrace();
             //should be impossible
+        }
+    }
+
+    private void loadAreas() {
+        try {
+            areas = apiHandler.getAreas();
+            List<AreaData> areasConfirmed = new ArrayList<>();
+            PreferencesHandler preferencesHandler = new PreferencesHandler(this);
+            int areaPos = 0;
+            int areaId = -1;
+            try {
+                areaId = preferencesHandler.getLastArea();
+            } catch (EmptyPreferencesException ignored) {
+            }
+            for (AreaData ad : areas) {
+                if (ad.isConfirmed()) {
+                    areasConfirmed.add(ad);
+                    if (areaId == ad.getId())
+                        areaPos = areasConfirmed.size() - 1;
+                }
+            }
+            String[] areaNames = new String[areasConfirmed.size()];
+            for (int i = 0; i < areaNames.length; i++) {
+                areaNames[i] = areasConfirmed.get(i).getName();
+            }
+            ArrayAdapter<String> adapter1 = new ArrayAdapter<>(this, android.R.layout.simple_list_item_activated_1, areaNames);
+            Spinner spinnerAreas = findViewById(R.id.spinner_areas);
+            spinnerAreas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    preferencesHandler.setLastArea(areasConfirmed.get(position));
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
+            int finalAreaPos = areaPos;
+            handler.post(() -> {
+                spinnerAreas.setAdapter(adapter1);
+                spinnerAreas.setSelection(finalAreaPos);
+            });
+
+        } catch (SessionErrorException | NoConnectionException | JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -200,33 +246,30 @@ public class AddGameActivity extends BasicPage {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, userNames);
         textView.setAdapter(adapter);
-        textView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                int posInList = -1;
-                for (int i = 0; i < autoCompleteUser.size(); i++) {
-                    if (textView.getText().toString().equals(autoCompleteUser.get(i).getFirstName() + " " + autoCompleteUser.get(i).getLastName())) {
-                        posInList = i;
-                        break;
-                    }
+        textView.setOnItemClickListener((parent, view, position, id1) -> {
+            int posInList = -1;
+            for (int i = 0; i < autoCompleteUser.size(); i++) {
+                if (textView.getText().toString().equals(autoCompleteUser.get(i).getFirstName() + " " + autoCompleteUser.get(i).getLastName())) {
+                    posInList = i;
+                    break;
                 }
-                if (posInList > -1) {
-                    game.getParticipants()[player] = autoCompleteUser.get(posInList);
-                    if (checkUserForDuplicate()) {
-                        game.getParticipants()[player] = null;
-                        textView.setText("");
-                        textView.setError(getString(R.string.user_used));
-                    }
-                    if (checkForBadPlayer() && game.getParticipants()[0].getPower() < 50) {
-                        game.getParticipants()[player] = null;
-                        textView.setText("");
-                        textView.setError(getString(R.string.bad_user));
-                    }
-                } else
-                    throw new RuntimeException("User not in list - Internal Error");
-
-
             }
+            if (posInList > -1) {
+                game.getParticipants()[player] = autoCompleteUser.get(posInList);
+                if (checkUserForDuplicate()) {
+                    game.getParticipants()[player] = null;
+                    textView.setText("");
+                    textView.setError(getString(R.string.user_used));
+                }
+                if (checkForBadPlayer() && game.getParticipants()[0].getPower() < 50) {
+                    game.getParticipants()[player] = null;
+                    textView.setText("");
+                    textView.setError(getString(R.string.bad_user));
+                }
+            } else
+                throw new RuntimeException("User not in list - Internal Error");
+
+
         });
     }
 
@@ -275,6 +318,8 @@ public class AddGameActivity extends BasicPage {
                         }
                     } catch (SessionErrorException | NoConnectionException e) {
                         e.printStackTrace();
+                    } catch (UserNotInAreaException e) {
+                        handler.post(() -> new DialogHandler().showAlterDialogOk(R.string.error, R.string.user_not_in_area, AddGameActivity.this));
                     }
                 }
             }
@@ -289,12 +334,7 @@ public class AddGameActivity extends BasicPage {
             scoreA = Integer.parseInt(et.getText().toString());
         } catch (Exception e) {
             final EditText finalEt = et;
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    finalEt.setError(getString(R.string.error_field_required));
-                }
-            });
+            handler.post(() -> finalEt.setError(getString(R.string.error_field_required)));
             return false;
         }
         et = findViewById(R.id.editText_score_team_b);
@@ -302,17 +342,22 @@ public class AddGameActivity extends BasicPage {
             scoreB = Integer.parseInt(et.getText().toString());
         } catch (Exception e) {
             final EditText finalEt = et;
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    finalEt.setError(getString(R.string.error_field_required));
-                }
-            });
+            handler.post(() -> finalEt.setError(getString(R.string.error_field_required)));
 
             return false;
         }
-
         game.setScores(scoreA, scoreB);
+
+
+        //####
+        Spinner spinner = findViewById(R.id.spinner_areas);
+        String areName = spinner.getSelectedItem().toString();
+        Log.e("are", areName);
+        for (AreaData ad : areas) {
+            if (ad.getName().equals(areName))
+                game.setAreaId(ad.getId());
+        }
+
         return true;
     }
 

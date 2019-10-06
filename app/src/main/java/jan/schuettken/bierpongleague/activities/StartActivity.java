@@ -32,20 +32,17 @@ public class StartActivity extends BasicPage {
 
     private void doBackgroundLogin() {
         final Handler handler = new Handler();
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException ignored) {
-                }
-                checkLogin(handler);
+        new Thread(() -> {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ignored) {
             }
-        }.start();
+            checkLogin(handler);
+        }).start();
     }
 
     private void checkLogin(Handler handler) {
-        String username = null, password = null;
+        String username, password;
 
         PreferencesHandler prefHandler = new PreferencesHandler(this);
         try {
@@ -59,19 +56,14 @@ public class StartActivity extends BasicPage {
 
         try {
             assert username != null && password != null;
-            ApiHandler apiHandler = new ApiHandler(username, password,this);
+            ApiHandler apiHandler = new ApiHandler(username, password, this);
             prefHandler.setSessionId(apiHandler.getSession());
             switchView(OverviewActivity.class, true, handler);
 
         } catch (InvalidLoginException e) {
             switchView(LoginActivity.class, true, handler);
         } catch (NoConnectionException | DatabaseException e) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    findViewById(R.id.retry_connect_to_server).setVisibility(View.VISIBLE);
-                }
-            });
+            handler.post(() -> findViewById(R.id.retry_connect_to_server).setVisibility(View.VISIBLE));
 
         }
     }

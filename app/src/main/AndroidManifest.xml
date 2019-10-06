@@ -3,13 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="jan.schuettken.bierpongleague">
 
-    <!-- To auto-complete the email text field in the login form with the user's emails -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!--<uses-permission android:name="android.permission.GET_ACCOUNTS" />-->
-    <!--<uses-permission android:name="android.permission.READ_PROFILE" />-->
-    <!--<uses-permission android:name="android.permission.READ_CONTACTS" />-->
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_logo_v3_2"
@@ -18,8 +11,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
-        <!-- TODO App index warning geht weg, wenn die app im store ist -->
         <activity
             android:name=".activities.OverviewActivity"
             android:label="@string/app_name"
@@ -53,6 +44,20 @@
         <activity
             android:name=".activities.ScoreboardActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.AddAreaActivity"
+            android:parentActivityName=".activities.MyAreasActivity" />
+        <activity
+            android:name=".activities.MyAreasActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.EditAreaActivity"
+            android:parentActivityName=".activities.MyAreasActivity"/>
     </application>
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

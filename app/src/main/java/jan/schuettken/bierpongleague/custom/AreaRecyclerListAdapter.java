@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.LightingColorFilter;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -11,14 +13,17 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 import jan.schuettken.bierpongleague.R;
-import jan.schuettken.bierpongleague.activities.ScoreboardActivity;
+import jan.schuettken.bierpongleague.basic.BasicDrawerPage;
+import jan.schuettken.bierpongleague.data.AreaData;
 import jan.schuettken.bierpongleague.data.UserData;
 import jan.schuettken.bierpongleague.handler.ApiHandler;
 
@@ -26,17 +31,17 @@ import jan.schuettken.bierpongleague.handler.ApiHandler;
  * Created by Jan Schüttken on 28.09.2018 at 14:18
  */
 
-public class ScoreboardRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder> implements ItemTouchHelperAdapter {
+public class AreaRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder> implements ItemTouchHelperAdapter {
 
-    private LinkedList<UserData> items = new LinkedList<>();
+    private List<AreaData> items = new LinkedList<>();
     private ListAction action;
-    private ScoreboardActivity context;
+    private BasicDrawerPage context;
     private View view;
     private ApiHandler apiHandler;
     private UserData currentUser;
 
 
-    public ScoreboardRecyclerListAdapter(ScoreboardActivity context) {
+    public AreaRecyclerListAdapter(BasicDrawerPage context) {
         this.context = context;
         this.apiHandler = context.createApiHandler();
     }
@@ -69,18 +74,18 @@ public class ScoreboardRecyclerListAdapter extends RecyclerView.Adapter<ItemView
         this.currentUser = currentUser;
     }
 
-    public LinkedList<UserData> getItems() {
+    public List<AreaData> getItems() {
         return items;
     }
 
-    public void setItems(LinkedList<UserData> items) {
+    public void setItems(List<AreaData> items) {
         this.items = items;
     }
 
     @NonNull
     @Override
     public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_scoreboard, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_area, parent, false);
         view = parent;
         return new ItemViewHolder(v);
     }
@@ -92,67 +97,63 @@ public class ScoreboardRecyclerListAdapter extends RecyclerView.Adapter<ItemView
         View vi = holder.view;
 
 
-        final UserData user = items.get(position);
-        TextView player;
+        final AreaData area = items.get(position);
+        TextView name;
 
-        player = vi.findViewById(R.id.name_player_first_name);
-        player.setText(user.getFirstName());
-        if(position<3)
-            player.setTextColor(Color.BLACK);
-        else
-            player.setTextColor(Color.WHITE);
-        player = vi.findViewById(R.id.name_player_last_name);
-        player.setText(user.getLastName());
-        if(position<3)
-            player.setTextColor(Color.BLACK);
-        else
-            player.setTextColor(Color.WHITE);
-        player = vi.findViewById(R.id.user_in_liga);
-        player.setText(((int) user.getElo()) + " ");
+        name = vi.findViewById(R.id.area_name);
+        name.setText(area.getName());
+//        if(position<3)
+//            name.setTextColor(Color.BLACK);
+//        else
+//            name.setTextColor(Color.WHITE);
+        name = vi.findViewById(R.id.are_info);
+        name.setText("");
+//        if(position<3)
+//            name.setTextColor(Color.BLACK);
+//        else
+//            name.setTextColor(Color.WHITE);
+        name = vi.findViewById(R.id.user_in_area);
 
-        vi.findViewById(R.id.imageView_crone).setVisibility(View.INVISIBLE);
-        RelativeLayout rl = vi.findViewById(R.id.color_region_player);
-
-        if (position == 0) {//the blue/green team is always the winner
-            Drawable d = context.getDrawable(R.drawable.color_gold_gradient);
-            rl.setBackground(d);
-            vi.findViewById(R.id.imageView_crone).setVisibility(View.VISIBLE);
-        } else if (position == 1) {
-            Drawable d = context.getDrawable(R.drawable.color_silver_gradient);
-            rl.setBackground(d);
-        } else if (position == 2) {
-            Drawable d = context.getDrawable(R.drawable.color_bronze_gradient);
-            rl.setBackground(d);
-        }else if (position < 10) {
-            Drawable d = context.getDrawable(R.drawable.color_green_gradient);
-            rl.setBackground(d);
-        } else if (user.getElo()<0){
-            Drawable d = context.getDrawable(R.drawable.color_red_gradient);
-            rl.setBackground(d);
-        }else{
-            Drawable d = context.getDrawable(R.drawable.color_prime_gradient);
-            rl.setBackground(d);
+        vi.findViewById(R.id.imageView_admin).setVisibility(
+                area.isAdmin(currentUser)
+                        ? View.VISIBLE : View.GONE);
+        ImageView iv = vi.findViewById(R.id.imageView_type);
+        RelativeLayout rl = vi.findViewById(R.id.color_region);
+        Drawable d,bg;
+        if (area.getType() == AreaData.TYPE_PUBLIC){
+            d = context.getDrawable(R.drawable.ic_public_black_24dp);
+            bg = context.getDrawable(R.drawable.color_green_gradient);
+            name.setText("");
         }
+        else if (area.getType() == AreaData.TYPE_PRIVATE){
+            d = context.getDrawable(R.drawable.ic_private_black_24dp);
+            bg = context.getDrawable(R.drawable.color_blue_gradient);
+            name.setText(area.getUsers().size()+"");
+        }
+        else{
+            d = context.getDrawable(R.drawable.ic_public_black_24dp);
+            bg = context.getDrawable(R.drawable.color_green_gradient);
+            name.setText("");
+        }
+        ColorFilter filter = new LightingColorFilter( Color.WHITE, Color.WHITE);
+        assert d != null;
+        d.setColorFilter(filter);
+        iv.setImageDrawable(d);
+        rl.setBackground(bg);
+
+        //active click action
+        holder.itemView.setOnClickListener(v -> action.action(position));
     }
 
     private void showConfirmInfoAndReload(Handler handler) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                context.showToast(R.string.game_confirmed);
-                showProgress(false);
-                context.loadGames();
-            }
+        handler.post(() -> {
+            context.showToast(R.string.game_confirmed);
+            showProgress(false);
         });
     }
 
     private void showProgress(final boolean show, Handler handler) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                showProgress(show);
-            }
-        });
+        handler.post(() -> showProgress(show));
     }
 
     private void showProgress(final boolean show) {

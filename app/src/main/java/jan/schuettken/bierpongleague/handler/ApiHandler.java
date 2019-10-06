@@ -14,14 +14,18 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import jan.schuettken.bierpongleague.data.AreaData;
 import jan.schuettken.bierpongleague.data.EloData;
 import jan.schuettken.bierpongleague.data.GameData;
 import jan.schuettken.bierpongleague.data.UserData;
 import jan.schuettken.bierpongleague.exceptions.DatabaseException;
 import jan.schuettken.bierpongleague.exceptions.InvalidLoginException;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
+import jan.schuettken.bierpongleague.exceptions.NotEnoughPowerException;
 import jan.schuettken.bierpongleague.exceptions.NoGamesException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
+import jan.schuettken.bierpongleague.exceptions.UserAlreadyInAreaException;
+import jan.schuettken.bierpongleague.exceptions.UserNotInAreaException;
 import jan.schuettken.bierpongleague.exceptions.UsernameTakenException;
 
 /**
@@ -91,17 +95,84 @@ public class ApiHandler {
     }
 
     /**
-     * @param game the filled game. For futher information look at {@link #addGame(UserData[], int[], int, String[]) addGame}
+     * @param game the filled game. For futher information look at {@link #addGame(UserData[], int[], int, String[]) addArea}
      * @return true: the game is confirmed
      * @throws SessionErrorException session is not set or outdated
      * @throws NoConnectionException Connection Timeout
      * @throws RuntimeException      in here the server response is stored
      */
-    public boolean addGame(GameData game) throws NoConnectionException, SessionErrorException, RuntimeException {
+    public boolean addGame(GameData game) throws NoConnectionException, SessionErrorException, RuntimeException, UserNotInAreaException {
         String[] des = new String[game.getDescription() == null ? 0 : 1];
         if (game.getDescription() != null)
             des[0] = game.getDescription();
         return addGame(game.getParticipants(), game.getScores(), game.getAreaId(), des);
+    }
+
+    /**
+     * @param area the filled are.
+     * @return true: the game is confirmed
+     * @throws SessionErrorException session is not set or outdated
+     * @throws NoConnectionException Connection Timeout
+     * @throws RuntimeException      in here the server response is stored
+     */
+    public boolean addArea(AreaData area, UserData user) throws NoConnectionException, SessionErrorException, RuntimeException {
+        String fileUrl = SERVER_URL + "addArea.php?session=" + session;
+        fileUrl += "&name=" + area.getName();
+        fileUrl += "&parentId=" + "-1";
+//        fileUrl += "&start=" +;
+//        fileUrl += "&end=" + ;
+        fileUrl += "&type=" + area.getType();
+        fileUrl += "&admin=" + user.getId();
+        Log.e("addArea", fileUrl);
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response.equalsIgnoreCase("#fail#session error")) {
+            Log.e("ADD_GAME", fileUrl);
+            throw new SessionErrorException(response);
+        }
+        if (response.startsWith("#fail#"))
+            throw new RuntimeException(response);
+        return true;
+    }
+
+    public void addUserToArea(AreaData area, UserData user) throws NoConnectionException, SessionErrorException, NotEnoughPowerException, UserAlreadyInAreaException {
+        String fileUrl = SERVER_URL + "addUserToArea.php?session=" + session;
+        fileUrl += "&area=" + area.getId();
+        fileUrl += "&user=" + user.getId();
+        Log.e("addUserToArea", fileUrl);
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response.equalsIgnoreCase("#fail#session error")) {
+            Log.e("addUserToArea", fileUrl);
+            throw new SessionErrorException(response);
+        }
+        if (response.equalsIgnoreCase("#fail#you must be admin")) {
+            throw new NotEnoughPowerException();
+        }
+        if (response.equalsIgnoreCase("#fail#user already in")) {
+            throw new UserAlreadyInAreaException();
+        }
+
+        if (response.startsWith("#fail#"))
+            throw new RuntimeException(response);
+    }
+
+    public void addUserToAreaWithCode(String code) throws NoConnectionException, SessionErrorException, UserAlreadyInAreaException {
+        String fileUrl = SERVER_URL + "addUserViaCode.php?session=" + session;
+        fileUrl += "&code=" + code;
+        Log.e("addUserToAreaWithCode", fileUrl);
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response.equalsIgnoreCase("#fail#session error")) {
+            Log.e("addUserToAreaWithCode", fileUrl);
+            throw new SessionErrorException(response);
+        }
+//        if (response.equalsIgnoreCase("#fail#you must be admin")) {
+//            throw new NotEnoughPowerException();
+//        }
+        if (response.equalsIgnoreCase("#fail#user already in")) {
+            throw new UserAlreadyInAreaException();
+        }
+
+        if (response.startsWith("#fail#"))
+            throw new RuntimeException(response);
     }
 
     /**
@@ -121,7 +192,7 @@ public class ApiHandler {
      * @throws RuntimeException      in here the server response is stored
      */
     public boolean addGame(@NonNull UserData[] participants, @NonNull int[] scores, @IntRange(from = 1) int areaId, String... description)
-            throws SessionErrorException, NoConnectionException, RuntimeException {//TODO Funktion ändern, wenn mehere Areas möglich sind
+            throws SessionErrorException, NoConnectionException, RuntimeException, UserNotInAreaException {//TODO Funktion ändern, wenn mehere Areas möglich sind
 
         if (participants.length != 4 || scores.length != 2)
             throw new IllegalArgumentException("participants.lengh must be 4, is: " + participants.length + " and scores.lengh must be 2, is: " + scores.length);
@@ -135,9 +206,14 @@ public class ApiHandler {
         fileUrl += "&scoreA=" + scores[0];
         fileUrl += "&scoreB=" + scores[1];
         fileUrl += "&areaId=" + areaId;
+
         if (description.length > 0)
             fileUrl += "&description=" + description[0];
         String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response.equalsIgnoreCase("#fail#user not in area")) {
+            Log.e("ADD_GAME", fileUrl);
+            throw new UserNotInAreaException();
+        }
         if (response.equalsIgnoreCase("#fail#session error")) {
             Log.e("ADD_GAME", fileUrl);
             throw new SessionErrorException(response);
@@ -291,6 +367,7 @@ public class ApiHandler {
 
             assert currentGame != null;//a game cant be null at this point
             currentGame.setGameId(gameId);//will be overwritten 4 times (if no guest takes place)
+            currentGame.setAreaId(c.getInt("AreaId"));
             currentGame.setDate(c.getString("Date"));//will be overwritten 4 times (if no guest takes place)
             currentGame.getParticipant(playerCounter).setId(c.getInt("Id"));
             score = c.getInt("Score");
@@ -316,11 +393,89 @@ public class ApiHandler {
             lastGameId = gameId;
             lastScore = score;
             firstRun = false;
-
-
         }
-
         return games;
+    }
+
+    /**
+     * @return a list of all Areas
+     * @throws SessionErrorException session is not set or outdated
+     * @throws NoConnectionException Connection Timeout
+     * @throws JSONException         the file is bad - might be an server problem
+     * @throws RuntimeException      in here the server response is stored
+     */
+    @NonNull
+    public List<AreaData> getAreas()
+            throws SessionErrorException, NoConnectionException, RuntimeException, JSONException {
+        String fileUrl = SERVER_URL + "getMyAreas.php?session=" + session;
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response == null)
+            throw new JSONException("Nothing to show here");
+        if (response.equalsIgnoreCase("#fail#session error"))
+            throw new SessionErrorException(response);
+        if (response.startsWith("#fail#"))
+            throw new RuntimeException(response);
+
+        JSONArray gameObjects = new JSONArray(response);
+        List<AreaData> areas = new ArrayList<>();
+        for (int i = 0; i < gameObjects.length(); i++) {
+            JSONObject c = gameObjects.getJSONObject(i);
+            areas.add(new AreaData(c));
+        }
+        getAreaAdmins(areas);
+        return areas;
+    }
+
+    public List<AreaData> getAreaAdmins(List<AreaData> areas) throws JSONException, SessionErrorException, NoConnectionException {
+        String fileUrl = SERVER_URL + "getAreaAdmin.php?session=" + session;
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response == null)
+            throw new JSONException("Nothing to show here");
+        if (response.equalsIgnoreCase("#fail#session error"))
+            throw new SessionErrorException(response);
+        if (response.startsWith("#fail#"))
+            throw new RuntimeException(response);
+
+        JSONArray gameObjects = new JSONArray(response);
+        for (int i = 0; i < gameObjects.length(); i++) {
+            JSONObject c = gameObjects.getJSONObject(i);
+            int areaId = c.getInt("AreaId");
+            int userId = c.getInt("Id");
+            UserData admin = new UserData().setId(userId);
+            for (AreaData ad : areas) {
+                if (ad.getId() == areaId) {
+                    ad.getAdmins().add(admin);
+                    break;
+                }
+            }
+        }
+        return areas;
+    }
+
+    public List<AreaData> getAreaUsers(List<AreaData> areas) throws JSONException, SessionErrorException, NoConnectionException {
+        String fileUrl = SERVER_URL + "getAreaUser.php?session=" + session;
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response == null)
+            throw new JSONException("Nothing to show here");
+        if (response.equalsIgnoreCase("#fail#session error"))
+            throw new SessionErrorException(response);
+        if (response.startsWith("#fail#"))
+            throw new RuntimeException(response);
+
+        JSONArray gameObjects = new JSONArray(response);
+        for (int i = 0; i < gameObjects.length(); i++) {
+            JSONObject c = gameObjects.getJSONObject(i);
+            int areaId = c.getInt("AreaId");
+            int userId = c.getInt("Id");
+            UserData admin = new UserData().setId(userId);
+            for (AreaData ad : areas) {
+                if (ad.getId() == areaId) {
+                    ad.getUsers().add(admin);
+                    break;
+                }
+            }
+        }
+        return areas;
     }
 
     /**
@@ -357,7 +512,7 @@ public class ApiHandler {
      * @throws RuntimeException      in here the server response is stored
      */
     public List<UserData> getScoreboard() throws JSONException, SessionErrorException, RuntimeException, NoConnectionException {
-        String fileUrl = SERVER_URL + "getScoreboard.php?session=" + session;
+        String fileUrl = SERVER_URL + "getMyScoreboard.php?session=" + session;
         String response = serverHandler.getJsonFromServer(fileUrl);
         if (response.equalsIgnoreCase("#fail#session error"))
             throw new SessionErrorException(response);

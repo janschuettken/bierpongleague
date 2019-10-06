@@ -45,13 +45,8 @@ public class ScoreboardActivity extends BasicDrawerPage {
         swipeContainer = findViewById(R.id.swipeContainer);
 
         // Setup refresh listener which triggers new data loading
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                loadGames();
-                //swipeContainer.setRefreshing(false);
-            }
-        });
+        //swipeContainer.setRefreshing(false);
+        swipeContainer.setOnRefreshListener(this::loadGames);
     }
 
     private void initializeList() {
@@ -93,28 +88,22 @@ public class ScoreboardActivity extends BasicDrawerPage {
 
     public void loadGames() {
         swipeContainer.setRefreshing(true);
-        new Thread() {
-            @Override
-            public void run() {
+        new Thread(()-> {
                 if (!checkApiHandler())
                     return;
                 try {
                     final List<UserData> games = apiHandler.getScoreboard();
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            recyclerList.getItems().clear();
-                            recyclerList.getItems().addAll(games);
-                            templateList.setAdapter(recyclerList);
-                            swipeContainer.setRefreshing(false);
-                        }
+                    handler.post(() -> {
+                        recyclerList.getItems().clear();
+                        recyclerList.getItems().addAll(games);
+                        templateList.setAdapter(recyclerList);
+                        swipeContainer.setRefreshing(false);
                     });
 
                 } catch (NoConnectionException | SessionErrorException | JSONException e) {
                     //should not happen
                     e.printStackTrace();
                 }
-            }
-        }.start();
+        }).start();
     }
 }

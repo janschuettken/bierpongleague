@@ -2,6 +2,7 @@ package jan.schuettken.bierpongleague.handler;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Pattern;
 
@@ -76,6 +77,15 @@ public class DateFunctionHandler {
     public static String convertDateToTimestamp(Date date) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return dateFormat.format(date);
+    }
+
+    public static Date convertTimestampToDate(String date) {
+        Calendar calendar = Calendar.getInstance();
+        String[] x = date.split(" ");
+        calendar.set(Calendar.YEAR, Integer.parseInt(x[0]));
+        calendar.set(Calendar.MONTH, Integer.parseInt(x[1]));
+        calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(x[2]));
+        return calendar.getTime();
     }
 
     public static String convertDateToTimestamp(int year, int month, int day) {

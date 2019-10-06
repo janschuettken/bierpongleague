@@ -94,27 +94,22 @@ public class OverviewActivity extends BasicDrawerPage {
 
     private void initializeBeersDrunk(List<GameData> games) {
         float liters = 0;
-
         if (games != null) {
-
             for (GameData g : games) {
-                if (!g.isWon()) {
-                    liters += (.5f * ((float) (10 - g.getScores()[0]) / 10.0f));
+                double tmp;
+                if (g.isWon()) {
+                    tmp = (.5f * ((float) (10 - g.getScores()[0]) / 10.0f));
                 } else {
-                    liters += .5f;
-                    liters += (.5f * ((float) (g.getScores()[0]) / 10.0f));
+                    tmp = .5f;
+                    tmp += (.5 * (((float) g.getScores()[1]) / 10.0));
                 }
+                liters += tmp;
             }
-
-
         }
         final float finalLiters = liters;
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                TextView tv = findViewById(R.id.beers_drunk);
-                tv.setText(getResString(R.string.beers_drunk_all_time, (int) finalLiters));
-            }
+        handler.post(() -> {
+            TextView tv = findViewById(R.id.beers_drunk);
+            tv.setText(getResString(R.string.beers_drunk_all_time, (int) finalLiters));
         });
 
 
@@ -211,6 +206,7 @@ public class OverviewActivity extends BasicDrawerPage {
         pieChartWinLose.setEntryLabelColor(Color.BLACK);
 //        pieChartWinLose.setEntryLabelTypeface(mTfRegular);
         pieChartWinLose.setEntryLabelTextSize(12f);
+        pieChartWinLose.setDrawEntryLabels(false);
     }
 
     private void refreshCharts() {

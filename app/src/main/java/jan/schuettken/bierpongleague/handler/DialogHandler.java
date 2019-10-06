@@ -2,7 +2,6 @@ package jan.schuettken.bierpongleague.handler;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -66,9 +65,21 @@ public class DialogHandler {
         return getAlterDialog(title, body, R.string.button_ok, ac, -1, null, -1, null, context);
     }
 
+    public void showAlterDialogOk(int title, int body, ActionInterface ac, Context context) {
+        getAlterDialog(title, body, R.string.button_ok, ac, -1, null, -1, null, context).show();
+    }
+
     public AlertDialog.Builder getAlterDialogOk(String title, String body, Context context) {
         return getAlterDialogOk(title, body, null, context);
 //        return getAlterDialog(title, body, context.getString(R.string.button_ok), null, null, null, null, null, context);
+    }
+
+    public void showAlterDialogOk(String title, String body, Context context) {
+        getAlterDialogOk(title, body, null, context).show();
+    }
+
+    public void showAlterDialogOk(int title, int body, Context context) {
+        getAlterDialogOk(title, body, null, context).show();
     }
 
     public AlertDialog.Builder getAlterDialogOk(int title, int body, Context context) {
@@ -86,35 +97,26 @@ public class DialogHandler {
         builder.setMessage(body);
         // Set up the buttons
         if (pos != null && !Objects.equals(pos, ""))
-            builder.setPositiveButton(pos, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (pos_a == null)
-                        dialog.cancel();
-                    else
-                        pos_a.run();
-                }
+            builder.setPositiveButton(pos, (dialog, which) -> {
+                if (pos_a == null)
+                    dialog.cancel();
+                else
+                    pos_a.run();
             });
         if (neg != null && !Objects.equals(neg, ""))
-            builder.setNeutralButton(neg, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (neg_a == null)
-                        dialog.cancel();
-                    else
-                        neg_a.run();
-                }
+            builder.setNeutralButton(neg, (dialog, which) -> {
+                if (neg_a == null)
+                    dialog.cancel();
+                else
+                    neg_a.run();
             });
         if (can != null && !Objects.equals(can, ""))
-            builder.setNegativeButton(can, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (can_a == null)
-                        dialog.cancel();
-                    else
-                        can_a.run();
+            builder.setNegativeButton(can, (dialog, which) -> {
+                if (can_a == null)
+                    dialog.cancel();
+                else
+                    can_a.run();
 
-                }
             });
         return builder;
     }
@@ -128,40 +130,31 @@ public class DialogHandler {
             builder.setMessage(body);
         // Set up the buttons
         if (positive != -1)
-            builder.setPositiveButton(positive, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (pos_a == null)
-                        dialog.cancel();
-                    else
-                        pos_a.run();
-                }
+            builder.setPositiveButton(positive, (dialog, which) -> {
+                if (pos_a == null)
+                    dialog.cancel();
+                else
+                    pos_a.run();
             });
         if (negative != -1)
-            builder.setNeutralButton(negative, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (neg_a == null)
-                        dialog.cancel();
-                    else
-                        neg_a.run();
-                }
+            builder.setNeutralButton(negative, (dialog, which) -> {
+                if (neg_a == null)
+                    dialog.cancel();
+                else
+                    neg_a.run();
             });
         if (cancel != -1)
-            builder.setNegativeButton(cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (can_a == null)
-                        dialog.cancel();
-                    else
-                        can_a.run();
+            builder.setNegativeButton(cancel, (dialog, which) -> {
+                if (can_a == null)
+                    dialog.cancel();
+                else
+                    can_a.run();
 
-                }
             });
         return builder;
     }
 
-    public Snackbar createSnakbar(View parent, int message, View.OnClickListener action, int actionText){
+    public Snackbar createSnakbar(View parent, int message, View.OnClickListener action, int actionText) {
         Snackbar mySnackbar = Snackbar.make(parent,
                 message, Snackbar.LENGTH_LONG);
         mySnackbar.setAction(actionText, action);
