@@ -61,8 +61,7 @@ public class MyOnChartValueSelectedListener implements OnChartValueSelectedListe
             int startThird = text.split("\n")[1].length();
             s.setSpan(new RelativeSizeSpan(1.9f), startSecond, startSecond + startThird + 1, 0);
             s.setSpan(new RelativeSizeSpan(.9f), startSecond + startThird + 1, s.length(), 0);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IndexOutOfBoundsException e) {
             s.setSpan(new RelativeSizeSpan(2.5f), startSecond, s.length(), 0);
         }
 

@@ -2,13 +2,15 @@ package jan.schuettken.bierpongleague.activities;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 
 import org.json.JSONException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -41,7 +43,7 @@ public class ScoreboardActivity extends BasicDrawerPage {
         initializeList();
     }
 
-    private void initializeRefreshListener(){
+    private void initializeRefreshListener() {
         swipeContainer = findViewById(R.id.swipeContainer);
 
         // Setup refresh listener which triggers new data loading
@@ -88,22 +90,26 @@ public class ScoreboardActivity extends BasicDrawerPage {
 
     public void loadGames() {
         swipeContainer.setRefreshing(true);
-        new Thread(()-> {
-                if (!checkApiHandler())
-                    return;
-                try {
-                    final List<UserData> games = apiHandler.getScoreboard();
-                    handler.post(() -> {
-                        recyclerList.getItems().clear();
-                        recyclerList.getItems().addAll(games);
-                        templateList.setAdapter(recyclerList);
-                        swipeContainer.setRefreshing(false);
-                    });
+        new Thread(() -> {
+            if (!checkApiHandler())
+                return;
+            try {
+                final List<UserData> _games = apiHandler.getScoreboard();
+                List<UserData> games = new ArrayList<>();
+                for (UserData ud : _games)
+                    if (ud.getElo() != 0)
+                        games.add(ud);
+                handler.post(() -> {
+                    recyclerList.getItems().clear();
+                    recyclerList.getItems().addAll(games);
+                    templateList.setAdapter(recyclerList);
+                    swipeContainer.setRefreshing(false);
+                });
 
-                } catch (NoConnectionException | SessionErrorException | JSONException e) {
-                    //should not happen
-                    e.printStackTrace();
-                }
+            } catch (NoConnectionException | SessionErrorException | JSONException e) {
+                //should not happen
+                e.printStackTrace();
+            }
         }).start();
     }
 }

@@ -18,7 +18,7 @@
             android:id="@+id/nav_to_confirm"
             android:icon="@drawable/ic_playlist_add_check_black_24dp"
             android:title="@string/to_confirm"
-            android:visible="false"/>
+            android:visible="false" />
         <item
             android:id="@+id/nav_scoreboard"
             android:icon="@drawable/ic_format_list_numbered_black_24dp"
@@ -41,13 +41,17 @@
                 android:icon="@drawable/ic_menu_share"
                 android:title="@string/share" />
             <item
-                android:id="@+id/nav_logout"
-                android:icon="@drawable/ic_power_settings_new_black_24dp"
-                android:title="@string/logout"/>
+                android:id="@+id/nav_profile"
+                android:icon="@drawable/ic_child_care_black_24dp"
+                android:title="@string/profile_settings" />
             <item
                 android:id="@+id/nav_version"
-                android:icon="@drawable/ic_child_care_black_24dp"
-                android:title="@string/app_version"/>
+                android:icon="@drawable/ic_bug_report_black_24dp"
+                android:title="@string/app_version" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_power_settings_new_black_24dp"
+                android:title="@string/logout" />
         </menu>
     </item>
 

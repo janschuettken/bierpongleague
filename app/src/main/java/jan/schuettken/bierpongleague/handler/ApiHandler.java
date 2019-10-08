@@ -3,10 +3,9 @@ package jan.schuettken.bierpongleague.handler;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,19 +19,23 @@ import jan.schuettken.bierpongleague.data.GameData;
 import jan.schuettken.bierpongleague.data.UserData;
 import jan.schuettken.bierpongleague.exceptions.DatabaseException;
 import jan.schuettken.bierpongleague.exceptions.InvalidLoginException;
+import jan.schuettken.bierpongleague.exceptions.MailNotTakenException;
+import jan.schuettken.bierpongleague.exceptions.MailTakenException;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
-import jan.schuettken.bierpongleague.exceptions.NotEnoughPowerException;
 import jan.schuettken.bierpongleague.exceptions.NoGamesException;
+import jan.schuettken.bierpongleague.exceptions.NotEnoughPowerException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
 import jan.schuettken.bierpongleague.exceptions.UserAlreadyInAreaException;
 import jan.schuettken.bierpongleague.exceptions.UserNotInAreaException;
 import jan.schuettken.bierpongleague.exceptions.UsernameTakenException;
+import jan.schuettken.bierpongleague.exceptions.WrongOldPasswordException;
 
 /**
  * Created by Jan Schüttken on 30.10.2018 at 21:23
  * All Api functions are stored here
  */
 public class ApiHandler {
+    private static final String FAIL = "#fail#";
     private final String SERVER_URL = "https://diewodesch.de/api/bierpong/";
     private ServerHandler serverHandler;
     private String session;
@@ -51,7 +54,7 @@ public class ApiHandler {
     /**
      * @param session Sets the session id<br>You can get one from: {@link #login(String, String, String) login}
      */
-    public void setSession(@NonNull String session) {
+    public void setSession(@NotNull String session) {
         this.session = session;
     }
 
@@ -60,17 +63,20 @@ public class ApiHandler {
      *
      * @param context is used to get The Version Code from The App
      */
-    public ApiHandler(@NonNull String username, @NonNull String password, @NonNull Context context) throws InvalidLoginException, NoConnectionException, DatabaseException {
+    public ApiHandler(@NotNull String username, @NotNull String password, @NotNull Context context) throws InvalidLoginException, NoConnectionException, DatabaseException {
         this();
         login(username, password, getVersionText(context));
     }
 
-    private String getVersionText(@NonNull Context context) {
+    private String getVersionText(@NotNull Context context) {
         PackageManager manager = context.getPackageManager();
         String versionName;
+        int code;
         try {
             PackageInfo info = manager.getPackageInfo(context.getPackageName(), 0);
             versionName = info.versionName;
+            code = info.versionCode;
+            versionName += " (" + code + ")";
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             versionName = "unknown";
@@ -82,7 +88,7 @@ public class ApiHandler {
     /**
      * @param session A session id is required - if you have non use: {@link #ApiHandler(String, String, Context) ApiHandler}
      */
-    public ApiHandler(@NonNull String session) {
+    public ApiHandler(@NotNull String session) {
         this();
         setSession(session);
     }
@@ -130,7 +136,7 @@ public class ApiHandler {
             throw new SessionErrorException(response);
         }
         if (response.startsWith("#fail#"))
-            throw new RuntimeException(response);
+            throw new NoConnectionException(response);
         return true;
     }
 
@@ -191,8 +197,9 @@ public class ApiHandler {
      * @throws NoConnectionException Connection Timeout
      * @throws RuntimeException      in here the server response is stored
      */
-    public boolean addGame(@NonNull UserData[] participants, @NonNull int[] scores, @IntRange(from = 1) int areaId, String... description)
-            throws SessionErrorException, NoConnectionException, RuntimeException, UserNotInAreaException {//TODO Funktion ändern, wenn mehere Areas möglich sind
+//    public boolean addGame(@NotNull UserData[] participants, @NotNull int[] scores, @IntRange(from = 1) int areaId, String... description)
+    public boolean addGame(@NotNull UserData[] participants, @NotNull int[] scores, int areaId, String... description)
+            throws SessionErrorException, NoConnectionException, RuntimeException, UserNotInAreaException {
 
         if (participants.length != 4 || scores.length != 2)
             throw new IllegalArgumentException("participants.lengh must be 4, is: " + participants.length + " and scores.lengh must be 2, is: " + scores.length);
@@ -233,7 +240,8 @@ public class ApiHandler {
      * @throws NoConnectionException Connection Timeout
      * @throws RuntimeException      in here the server response is stored
      */
-    public boolean confirmGame(@IntRange(from = 1) int gameId, boolean confirm)
+    public boolean confirmGame(int gameId, boolean confirm)
+//    public boolean confirmGame(@IntRange(from = 1) int gameId, boolean confirm)
             throws SessionErrorException, NoConnectionException, RuntimeException {
 
         String fileUrl = SERVER_URL + "updateConfirm.php?session=" + session;
@@ -255,12 +263,14 @@ public class ApiHandler {
      * @throws InvalidLoginException Password does not match the Username
      * @throws DatabaseException     Internal server error - maybe the server crashed?
      */
-    public boolean login(@NonNull String username, @NonNull String password, @NonNull String version)
+    public boolean login(@NotNull String username, @NotNull String password, @NotNull String version)
             throws NoConnectionException, InvalidLoginException, DatabaseException {
         String fileUrl = SERVER_URL + "login.php?user=" + username + "&password=" + password + "&version=Android " + version;
         //Log.e("LOGIN", fileUrl);
         String response = serverHandler.getJsonFromServer(fileUrl);
         //Log.e("LOGIN", response);
+        if (response == null)
+            throw new NoConnectionException();
         if (response.startsWith("#fail#wrongPassword") || response.startsWith("#fail#usernameNotTaken"))
             throw new InvalidLoginException(response);
         if (response.startsWith("#fail#"))
@@ -278,7 +288,7 @@ public class ApiHandler {
      * @throws NoConnectionException  Connection Timeout
      * @throws UsernameTakenException The filled in Username or Email are already taken
      */
-    public boolean register(@NonNull UserData user) throws NoConnectionException, UsernameTakenException {
+    public boolean register(@NotNull UserData user) throws NoConnectionException, UsernameTakenException, MailTakenException {
         String fileUrl = SERVER_URL + "addUser.php";
         fileUrl += "?username=" + user.getUsername();
         fileUrl += "&password=" + user.getPassword();
@@ -292,6 +302,8 @@ public class ApiHandler {
         //Log.e("REGISTER", response);
         if (response.equalsIgnoreCase("#fail#user exists already"))
             throw new UsernameTakenException(response);
+        if (response.equalsIgnoreCase("#fail#mailIsTaken"))
+            throw new MailTakenException();
         if (response.startsWith("#fail#"))
             throw new RuntimeException(response);
 
@@ -307,7 +319,7 @@ public class ApiHandler {
      * @throws JSONException         the file is bad - might be an server problem
      * @throws RuntimeException      in here the server response is stored
      */
-    public List<GameData> getGames(@NonNull UserData user, boolean youAreInTeamOne)
+    public List<GameData> getGames(@NotNull UserData user, boolean youAreInTeamOne)
             throws NoConnectionException, SessionErrorException, RuntimeException, JSONException, NoGamesException {
         return getGames(user.getId(), youAreInTeamOne);
     }
@@ -321,8 +333,9 @@ public class ApiHandler {
      * @throws JSONException         the file is bad - might be an server problem
      * @throws RuntimeException      in here the server response is stored
      */
-    @NonNull
-    public List<GameData> getGames(@IntRange(from = 0) int userId, boolean youAreInTeamOne)
+    @NotNull
+//    public List<GameData> getGames(@IntRange(from = 0) int userId, boolean youAreInTeamOne)
+    public List<GameData> getGames(int userId, boolean youAreInTeamOne)
             throws SessionErrorException, NoConnectionException, RuntimeException, JSONException, NoGamesException {
         String fileUrl = SERVER_URL + "getGame.php?session=" + session;
         fileUrl += "&userId=" + userId;
@@ -404,7 +417,7 @@ public class ApiHandler {
      * @throws JSONException         the file is bad - might be an server problem
      * @throws RuntimeException      in here the server response is stored
      */
-    @NonNull
+    @NotNull
     public List<AreaData> getAreas()
             throws SessionErrorException, NoConnectionException, RuntimeException, JSONException {
         String fileUrl = SERVER_URL + "getMyAreas.php?session=" + session;
@@ -455,6 +468,7 @@ public class ApiHandler {
     public List<AreaData> getAreaUsers(List<AreaData> areas) throws JSONException, SessionErrorException, NoConnectionException {
         String fileUrl = SERVER_URL + "getAreaUser.php?session=" + session;
         String response = serverHandler.getJsonFromServer(fileUrl);
+        Log.e("getAreaUsers", fileUrl);
         if (response == null)
             throw new JSONException("Nothing to show here");
         if (response.equalsIgnoreCase("#fail#session error"))
@@ -467,10 +481,10 @@ public class ApiHandler {
             JSONObject c = gameObjects.getJSONObject(i);
             int areaId = c.getInt("AreaId");
             int userId = c.getInt("Id");
-            UserData admin = new UserData().setId(userId);
+            UserData user = new UserData().setId(userId);
             for (AreaData ad : areas) {
                 if (ad.getId() == areaId) {
-                    ad.getUsers().add(admin);
+                    ad.getUsers().add(user);
                     break;
                 }
             }
@@ -614,5 +628,72 @@ public class ApiHandler {
         JSONObject gameObject = new JSONObject(response);
 
         return new UserData(gameObject);
+    }
+
+    /**
+     * @param mail the mail to send a ne new password to
+     * @throws MailNotTakenException the mail is not taken
+     * @throws NoConnectionException no connection to the database
+     */
+    public void forgotPassword(String mail) throws MailNotTakenException, NoConnectionException {
+        String fileUrl = SERVER_URL + "forgotPassword.php?mail=" + mail;
+        Log.e("FORGOT", fileUrl);
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        Log.e("FORGOT", response);
+        if (response.startsWith("#fail#"))
+            throw new MailNotTakenException();
+    }
+
+    /**
+     * @return the mail off the logged in user
+     * @throws NoConnectionException no connection to the database
+     * @throws SessionErrorException session is not set or outdated
+     * @throws JSONException         the file is bad - might be an server problem
+     */
+    public String getMail() throws NoConnectionException, SessionErrorException, JSONException {
+        String url = SERVER_URL + "getMail.php?session=" + session;
+        Log.e("Mail", url);
+        String response = serverHandler.getJsonFromServer(url);
+        if (response == null)
+            throw new NoConnectionException();
+        if (response.equalsIgnoreCase("#fail#session error"))
+            throw new SessionErrorException(response);
+        //TODO addErrorCases
+        JSONArray gameObjects = new JSONArray(response);
+
+        if (gameObjects.length() > 0) {
+            JSONObject o = gameObjects.getJSONObject(0);
+            return o.get("mail").toString();
+        }
+        return "";
+    }
+
+    public void changeUsername(String username) throws NoConnectionException, UsernameTakenException {
+        String fileUrl = SERVER_URL + "changeUsername.php?session=" + session + "&username=" + username;
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response.startsWith(FAIL + "usernameTaken"))
+            throw new UsernameTakenException();
+        if (response.startsWith(FAIL))
+            throw new NoConnectionException();
+    }
+
+    public void changePassword(String password, String oldPassword) throws NoConnectionException, WrongOldPasswordException {
+        String fileUrl = SERVER_URL + "changePassword.php?session=" + session + "&password=" + password + "&old_password=" + oldPassword;
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response.startsWith(FAIL + "wrongOldPassword")) {
+            Log.e("changePassword", fileUrl);
+            throw new WrongOldPasswordException();
+        }
+        if (response.startsWith(FAIL))
+            throw new NoConnectionException();
+    }
+
+    public void changeMail(String mail) throws NoConnectionException, MailTakenException {
+        String fileUrl = SERVER_URL + "changeMail.php?session=" + session + "&mail=" + mail;
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response.startsWith(FAIL + "usernameTaken"))
+            throw new MailTakenException();
+        if (response.startsWith(FAIL))
+            throw new NoConnectionException();
     }
 }

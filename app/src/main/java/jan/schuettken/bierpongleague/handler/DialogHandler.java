@@ -2,9 +2,9 @@ package jan.schuettken.bierpongleague.handler;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.DatePicker;
 

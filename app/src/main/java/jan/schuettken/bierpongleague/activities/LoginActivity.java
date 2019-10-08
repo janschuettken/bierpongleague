@@ -5,17 +5,15 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+
+import org.jetbrains.annotations.Nullable;
 
 import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.basic.BasicPage;
@@ -57,15 +55,12 @@ public class LoginActivity extends BasicPage {
         PreferencesHandler preferencesHandler = new PreferencesHandler(this);
 
         mPasswordView = findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
+        mPasswordView.setOnEditorActionListener((textView, id, keyEvent) -> {
+            if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                attemptLogin();
+                return true;
             }
+            return false;
         });
 
         try {
@@ -75,11 +70,11 @@ public class LoginActivity extends BasicPage {
         }
 
         Button mEmailSignInButton = findViewById(R.id.username_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
+        mEmailSignInButton.setOnClickListener(view -> attemptLogin());
+
+        Button forgotPasswordButton = findViewById(R.id.forgot_password_button);
+        forgotPasswordButton.setOnClickListener(view -> {
+            switchView(ForgotPasswordActivity.class);
         });
 
         mLoginFormView = findViewById(R.id.login_form);
@@ -165,9 +160,7 @@ public class LoginActivity extends BasicPage {
     private void login(final String username, final String password) {
         final Handler handler = new Handler();
 
-        new Thread() {
-            @Override
-            public void run() {
+        new Thread(()-> {
                 boolean success = false;
                 ApiHandler apiHandler = null;
                 try {
@@ -187,25 +180,21 @@ public class LoginActivity extends BasicPage {
 
                 final boolean finalSuccess = success;
                 final ApiHandler finalApiHandler = apiHandler;
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        showProgress(false);
-                        Log.e("LOGIN", "result:" + finalSuccess);
-                        if (finalSuccess) {
-                            PreferencesHandler preferencesHandler = new PreferencesHandler(LoginActivity.this);
-                            preferencesHandler.setSessionId(finalApiHandler.getSession());
-                            preferencesHandler.setUsername(username);
-                            preferencesHandler.setPassword(password);
-                            switchView(OverviewActivity.class, true);
-                        } else {
-                            mPasswordView.setError(getString(R.string.error_incorrect_password));
-                            mPasswordView.requestFocus();
-                        }
+                handler.post(() -> {
+                    showProgress(false);
+                    Log.e("LOGIN", "result:" + finalSuccess);
+                    if (finalSuccess) {
+                        PreferencesHandler preferencesHandler = new PreferencesHandler(LoginActivity.this);
+                        preferencesHandler.setSessionId(finalApiHandler.getSession());
+                        preferencesHandler.setUsername(username);
+                        preferencesHandler.setPassword(password);
+                        switchView(OverviewActivity.class, true);
+                    } else {
+                        mPasswordView.setError(getString(R.string.error_incorrect_password));
+                        mPasswordView.requestFocus();
                     }
                 });
-            }
-        }.start();
+        }).start();
 
     }
 
@@ -214,7 +203,8 @@ public class LoginActivity extends BasicPage {
     }
 
     private boolean isPasswordValid(String password) {
-        return password.length() >= 8;
+        return true;
+//        return password.length() >= 8;
     }
 
     /**

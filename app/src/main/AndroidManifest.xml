@@ -45,6 +45,9 @@
             android:name=".activities.ScoreboardActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".activities.ProfileSettingsActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".activities.AddAreaActivity"
             android:parentActivityName=".activities.MyAreasActivity" />
         <activity
@@ -53,11 +56,16 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.EditAreaActivity"
-            android:parentActivityName=".activities.MyAreasActivity"/>
+            android:parentActivityName=".activities.MyAreasActivity" />
+        <activity
+            android:name=".activities.ForgotPasswordActivity"
+            android:parentActivityName=".activities.LoginActivity" />
+        <activity android:name=".activities.ProfilePasswordSettingsActivity"
+            android:parentActivityName=".activities.ProfileSettingsActivity" />
     </application>
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 </manifest>

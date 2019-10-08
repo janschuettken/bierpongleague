@@ -3,7 +3,6 @@ package jan.schuettken.bierpongleague.activities;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.SpannableString;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,7 +29,6 @@ import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.basic.BasicDrawerPage;
 import jan.schuettken.bierpongleague.custom.MyOnChartValueSelectedListener;
 import jan.schuettken.bierpongleague.data.GameData;
-import jan.schuettken.bierpongleague.data.UserData;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.exceptions.NoGamesException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
@@ -39,7 +37,6 @@ import jan.schuettken.bierpongleague.handler.ColorFunctionProvider;
 
 public class OverviewActivity extends BasicDrawerPage {
 
-    private Handler handler;
     private ApiHandler apiHandler;
     private PieChart pieChartWinLose;
     private MyOnChartValueSelectedListener pieChartWinLoseClick;
@@ -76,20 +73,10 @@ public class OverviewActivity extends BasicDrawerPage {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_overview);
 //        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.played_games);
-        initializeHandler();
 //        initializeStats();
         initPieChart();
         refreshCharts();
-        try {
-            initializeElo();
-        } catch (SessionErrorException | JSONException | NoConnectionException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void initializeHandler() {
-        handler = new Handler();
-        apiHandler = createApiHandler();
+        initializeElo();
     }
 
     private void initializeBeersDrunk(List<GameData> games) {
@@ -116,13 +103,28 @@ public class OverviewActivity extends BasicDrawerPage {
     }
 
     @SuppressLint("SetTextI18n")
-    private void initializeElo() throws SessionErrorException, JSONException, NoConnectionException {
-        UserData you = apiHandler.getYourself();
-        TextView nameField = findViewById(R.id.name_field);
-        nameField.setText(you.getFirstName() + " " + you.getLastName());
-        TextView eloField = findViewById(R.id.your_elo_text);
-        eloField.setText(0 + "");
-        slowlyIncreaseElo(you.getElo(), eloField);
+    private void initializeElo() {
+        new Thread(() -> {
+            try {
+                TextView nameField = findViewById(R.id.name_field);
+                TextView eloField = findViewById(R.id.your_elo_text);
+
+                if (currentUser == null) {
+                    ApiHandler apiHandler = _createApiHandler();
+                    currentUser = apiHandler.getYourself();
+                }
+
+                handler.post(() -> {
+                    eloField.setText(0 + "");
+                    nameField.setText(currentUser.getFirstName() + " " + currentUser.getLastName());
+                });
+
+                slowlyIncreaseElo(currentUser.getElo(), eloField);
+            } catch (SessionErrorException | JSONException | NoConnectionException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
     }
 
     private void slowlyIncreaseElo(double elo, final TextView eloField) {
@@ -130,27 +132,16 @@ public class OverviewActivity extends BasicDrawerPage {
         steps = ms / wait;//should be an int otherwise is the shown elo not exactly precise
 
         final double increase = elo / steps;
-        new Thread() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void run() {
-                for (int i = 0; i <= steps; i++) {
-                    try {
-                        Thread.sleep((long) wait);
-                    } catch (InterruptedException ignored) {
-                    }
-                    final int finalI = i;
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            eloField.setText(((int) (increase * finalI)) + "");
-                        }
-                    });
-
-                }
-
+        for (int i = 0; i <= steps; i++) {
+            try {
+                Thread.sleep((long) wait);
+            } catch (InterruptedException ignored) {
             }
-        }.start();
+            final int finalI = i;
+            handler.post(() -> eloField.setText(((int) (increase * finalI)) + ""));
+
+        }
+
     }
 
     private void initPieChart() {
@@ -214,20 +205,19 @@ public class OverviewActivity extends BasicDrawerPage {
             @Override
             public void run() {
                 try {
+                    if (apiHandler == null)
+                        apiHandler = createApiHandler();
                     final List<GameData> games = apiHandler.getGames(apiHandler.getYourself(), true);
                     initializeBeersDrunk(games);
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (games != null) {
-                                findViewById(R.id.region_win_lose_stats).setVisibility(View.VISIBLE);
-                                setItemDataCategoryChart(games);
-                                pieChartWinLoseClick.onNothingSelected();
-                                pieChartWinLose.invalidate();
-                                pieChartWinLose.animateX(2500);
-                            }
-
+                    handler.post(() -> {
+                        if (games != null) {
+                            findViewById(R.id.region_win_lose_stats).setVisibility(View.VISIBLE);
+                            setItemDataCategoryChart(games);
+                            pieChartWinLoseClick.onNothingSelected();
+                            pieChartWinLose.invalidate();
+                            pieChartWinLose.animateX(2500);
                         }
+
                     });
                 } catch (NoConnectionException | SessionErrorException | JSONException | NoGamesException e) {
                     initializeBeersDrunk(null);

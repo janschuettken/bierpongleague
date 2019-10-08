@@ -9,11 +9,12 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.Serializable;
 
@@ -31,15 +32,7 @@ import jan.schuettken.bierpongleague.handler.PreferencesHandler;
  */
 
 @SuppressLint("Registered")
-public class BasicPage extends AppCompatActivity implements PageInterfaceLarge {
-
-    public static final int REQUEST_REFRESH = 1;
-    public static final int REQUEST_FILTER = 2;
-    public static final int REQUEST_DOWNLOAD_ENTRIES = 3;
-    public static final int REQUEST_PASSWORD = 4;
-    public static final int RESULT_DELETED = 10;
-    public static final String PASS_AREA = "PASS_AREA";
-    public final static String CURRENT_USER = "CURRENT_USER";
+public class BasicPage extends AppCompatActivity implements PageInterfaceLarge, ConstantInterface {
 
     @Override
     public void switchView(Class<?> o) {
@@ -255,8 +248,37 @@ public class BasicPage extends AppCompatActivity implements PageInterfaceLarge {
         finish();
     }
 
+    public void finishWithExtra(int code, Portable... portables) {
+        Intent intent = new Intent();
+        Bundle bundle = new Bundle();
+        for (Portable p : portables) {
+            bundle.putSerializable(p.getKey(), p.getSerializable());
+        }
+        intent.putExtras(bundle);
+        setResult(code, intent);
+        finish();
+    }
+
     public void finish(Handler handler) {
         handler.post(this::finish);
+    }
+
+    public ApiHandler _createApiHandler() {
+        PreferencesHandler preferencesHandler = new PreferencesHandler(this);
+        ApiHandler apiHandler;
+        try {
+            apiHandler = new ApiHandler(preferencesHandler.getUsername(), preferencesHandler.getPassword(), this);
+            return apiHandler;
+        } catch (NoConnectionException | DatabaseException e1) {
+            e1.printStackTrace();
+//                switchView(LoginActivity.class, true);
+            return null;
+        } catch (InvalidLoginException | EmptyPreferencesException e1) {
+            e1.printStackTrace();
+            //You shouldn't be logged in
+            switchView(LoginActivity.class, true);
+            return null;
+        }
     }
 
     public ApiHandler createApiHandler() {
@@ -271,7 +293,7 @@ public class BasicPage extends AppCompatActivity implements PageInterfaceLarge {
                 apiHandler = new ApiHandler(preferencesHandler.getUsername(), preferencesHandler.getPassword(), this);
                 return apiHandler;
             } catch (NoConnectionException | DatabaseException e1) {
-                switchView(LoginActivity.class, true);
+//                switchView(LoginActivity.class, true);
                 return null;
             } catch (InvalidLoginException | EmptyPreferencesException e1) {
                 //You shouldn't be logged in

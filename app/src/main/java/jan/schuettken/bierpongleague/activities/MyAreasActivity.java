@@ -2,15 +2,16 @@ package jan.schuettken.bierpongleague.activities;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import org.json.JSONException;
 
@@ -144,7 +145,7 @@ public class MyAreasActivity extends BasicDrawerPage {
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setEnabled(true);
-        input.setText("04fmkSzAcA");
+//        input.setText("04fmkSzAcA");
         builder.setView(input);
         builder.setPositiveButton(R.string.button_ok, (dialog, which) -> {
             String code = input.getText().toString();

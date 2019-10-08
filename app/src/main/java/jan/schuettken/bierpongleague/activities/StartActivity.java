@@ -4,9 +4,10 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.content.pm.PackageInfoCompat;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.core.content.pm.PackageInfoCompat;
 
 import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.basic.BasicPage;

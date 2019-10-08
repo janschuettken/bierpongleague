@@ -9,6 +9,7 @@ import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.basic.BasicPage;
 import jan.schuettken.bierpongleague.basic.Portable;
 import jan.schuettken.bierpongleague.data.UserData;
+import jan.schuettken.bierpongleague.exceptions.MailTakenException;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.exceptions.UsernameTakenException;
 import jan.schuettken.bierpongleague.handler.ApiHandler;
@@ -32,6 +33,8 @@ public class RegisterActivity extends BasicPage {
             } catch (NoConnectionException ignored) {
             } catch (UsernameTakenException e) {
                 ((EditText) findViewById(R.id.username)).setError(getString(R.string.username_taken));
+            } catch (MailTakenException e) {
+                ((EditText) findViewById(R.id.mail)).setError(getString(R.string.mail_taken));
             }
             finishWithResult(RESULT_OK, new Portable("user", user));
         }

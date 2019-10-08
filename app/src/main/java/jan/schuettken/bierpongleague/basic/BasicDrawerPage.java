@@ -6,16 +6,15 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.content.pm.PackageInfoCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.pm.PackageInfoCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -23,7 +22,9 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.google.android.material.navigation.NavigationView;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 
 import java.util.ArrayList;
@@ -37,13 +38,14 @@ import jan.schuettken.bierpongleague.activities.LoginActivity;
 import jan.schuettken.bierpongleague.activities.MyAreasActivity;
 import jan.schuettken.bierpongleague.activities.OverviewActivity;
 import jan.schuettken.bierpongleague.activities.PlayedGamesActivity;
+import jan.schuettken.bierpongleague.activities.ProfileSettingsActivity;
 import jan.schuettken.bierpongleague.activities.ScoreboardActivity;
 import jan.schuettken.bierpongleague.data.EloData;
 import jan.schuettken.bierpongleague.data.UserData;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
 import jan.schuettken.bierpongleague.handler.ApiHandler;
-import jan.schuettken.bierpongleague.handler.PreferencesHandler;
+import jan.schuettken.bierpongleague.handler.LogoutHandler;
 
 /**
  * Created by Jan Schüttken on 03.11.2018 at 11:50
@@ -53,7 +55,7 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
     protected UserData currentUser = null;
     private LineDataSet lineDataSetPreview;
     private LineChart lineChartPreview;
-    private Handler handler;
+    protected Handler handler;
     private ApiHandler apiHandler;
 
     @Override
@@ -95,7 +97,6 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
         findViewById(R.id.fab).setOnClickListener(view -> switchView(AddGameActivity.class));
 
         handler = new Handler();
-        apiHandler = createApiHandler();
         initializeLineChart(head);
         selectPage();
     }
@@ -111,7 +112,7 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+    public boolean onNavigationItemSelected(@NotNull MenuItem item) {
         // Handle navigation view item clicks here.
 
         switch (item.getItemId()) {
@@ -145,6 +146,11 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
                     switchView(MyAreasActivity.class, true, new Portable(CURRENT_USER, currentUser));
                 }
                 break;
+            case R.id.nav_profile:
+                if (!(this instanceof ProfileSettingsActivity)) {
+                    switchView(ProfileSettingsActivity.class, true, new Portable(CURRENT_USER, currentUser));
+                }
+                break;
             case R.id.nav_share:
                 shareApp();
                 break;
@@ -162,10 +168,7 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
     }
 
     private void logout() {
-        PreferencesHandler preferencesHandler = new PreferencesHandler(this);
-        preferencesHandler.setPassword("");
-        preferencesHandler.setUsername("");
-        preferencesHandler.setSessionId("");
+        LogoutHandler.logout(this);
         switchView(LoginActivity.class, true);
     }
 
@@ -210,57 +213,55 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
 
 
     private void initializeLineChart(View head) {
-        lineChartPreview = head.findViewById(R.id.elo_preview_line_chart);
+        new Thread(() -> {
+            lineChartPreview = head.findViewById(R.id.elo_preview_line_chart);
 
-        ArrayList<Entry> lineEntries = new ArrayList<>();
-        lineDataSetPreview = new LineDataSet(lineEntries, getResString(R.string.elo_trend));
-        lineDataSetPreview.setAxisDependency(YAxis.AxisDependency.LEFT);
-        lineDataSetPreview.setHighlightEnabled(false);
-        lineDataSetPreview.setLineWidth(2);
-        lineDataSetPreview.setColor(getColor(R.color.colorPrimary));
-        lineDataSetPreview.setCircleColor(getColor(R.color.colorAccent));
-        lineDataSetPreview.setCircleRadius(2);
-        lineDataSetPreview.setCircleHoleRadius(1);
-        lineDataSetPreview.setDrawCircles(false);
-        lineDataSetPreview.setDrawHighlightIndicators(false);
-        lineDataSetPreview.setHighLightColor(Color.RED);
-        lineDataSetPreview.setValueTextSize(12);
-        lineDataSetPreview.setValueTextColor(getColor(R.color.colorBlueDark));
-        lineDataSetPreview.setDrawValues(false);
-        lineDataSetPreview.setDrawFilled(true);
+            ArrayList<Entry> lineEntries = new ArrayList<>();
+            lineDataSetPreview = new LineDataSet(lineEntries, getResString(R.string.elo_trend));
+            lineDataSetPreview.setAxisDependency(YAxis.AxisDependency.LEFT);
+            lineDataSetPreview.setHighlightEnabled(false);
+            lineDataSetPreview.setLineWidth(2);
+            lineDataSetPreview.setColor(getColor(R.color.colorPrimary));
+            lineDataSetPreview.setCircleColor(getColor(R.color.colorAccent));
+            lineDataSetPreview.setCircleRadius(2);
+            lineDataSetPreview.setCircleHoleRadius(1);
+            lineDataSetPreview.setDrawCircles(false);
+            lineDataSetPreview.setDrawHighlightIndicators(false);
+            lineDataSetPreview.setHighLightColor(Color.RED);
+            lineDataSetPreview.setValueTextSize(12);
+            lineDataSetPreview.setValueTextColor(getColor(R.color.colorBlueDark));
+            lineDataSetPreview.setDrawValues(false);
+            lineDataSetPreview.setDrawFilled(true);
 
-        LineData lineData = new LineData(lineDataSetPreview);
+            LineData lineData = new LineData(lineDataSetPreview);
 
-        lineChartPreview.getDescription().setText("");
-        lineChartPreview.getDescription().setTextSize(12);
-        lineChartPreview.setDrawMarkers(true);
-//        lineChartPreview.setMarker(markerView(context));
-//        lineChartPreview.getAxisLeft().addLimitLine(lowerLimitLine(2,"Lower Limit",2,12,getColor("defaultOrange"),getColor("defaultOrange")));
-//        lineChartPreview.getAxisLeft().addLimitLine(upperLimitLine(5,"Upper Limit",2,12,getColor("defaultGreen"),getColor("defaultGreen")));
-        lineChartPreview.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-//        lineChartPreview.animateY(1000);
-        lineChartPreview.getXAxis().setGranularityEnabled(false);
-        lineChartPreview.getXAxis().setGranularity(1.0f);
-        lineChartPreview.getXAxis().setLabelCount(lineDataSetPreview.getEntryCount());
-        lineChartPreview.getXAxis().setDrawLabels(false);
-        lineChartPreview.getXAxis().setDrawGridLines(false);
-        lineChartPreview.getXAxis().setDrawLabels(false);
-        lineChartPreview.getAxisLeft().setDrawLabels(false);
-        lineChartPreview.getAxisRight().setDrawLabels(false);
-        lineChartPreview.getAxisLeft().setDrawGridLines(false);
-        lineChartPreview.getAxisRight().setDrawGridLines(false);
-        lineChartPreview.setData(lineData);
-        lineChartPreview.getLegend().setEnabled(false);
+            lineChartPreview.getDescription().setText("");
+            lineChartPreview.getDescription().setTextSize(12);
+            lineChartPreview.setDrawMarkers(true);
+            lineChartPreview.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+            lineChartPreview.getXAxis().setGranularityEnabled(false);
+            lineChartPreview.getXAxis().setGranularity(1.0f);
+            lineChartPreview.getXAxis().setLabelCount(lineDataSetPreview.getEntryCount());
+            lineChartPreview.getXAxis().setDrawLabels(false);
+            lineChartPreview.getXAxis().setDrawGridLines(false);
+            lineChartPreview.getXAxis().setDrawLabels(false);
+            lineChartPreview.getAxisLeft().setDrawLabels(false);
+            lineChartPreview.getAxisRight().setDrawLabels(false);
+            lineChartPreview.getAxisLeft().setDrawGridLines(false);
+            lineChartPreview.getAxisRight().setDrawGridLines(false);
+            lineChartPreview.setData(lineData);
+            lineChartPreview.getLegend().setEnabled(false);
 
-        refreshLineChart(head);
+            refreshLineChart(head);
+        }).start();
     }
 
     @SuppressLint("SetTextI18n")
     private void refreshLineChart(final View head) {
 
         new Thread(() -> {
-
             try {
+                ApiHandler apiHandler = _createApiHandler();
                 List<EloData> elos = apiHandler.getEloPreview();
                 if (elos != null) {
                     final List<Entry> lineEntries = new ArrayList<>();
