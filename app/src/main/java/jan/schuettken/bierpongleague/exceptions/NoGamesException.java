@@ -7,4 +7,7 @@ public class NoGamesException extends Exception {
     public NoGamesException(String errorText) {
         super(errorText);
     }
+
+    public NoGamesException() {
+    }
 }

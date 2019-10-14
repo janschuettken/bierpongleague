@@ -16,13 +16,11 @@ import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 public class ServerHandler implements Serializable {
 
     public String getJsonFromServer(String url) throws NoConnectionException {
-
         try {
             return new AsyncServerTaskExtends().execute(url).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new NoConnectionException("Error while reading from Server");
         }
-
     }
 
     public boolean appendTextToFile(File file, String s) {

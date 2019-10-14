@@ -7,6 +7,10 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".activities.EloTrendActivity">
     <!--tools:showIn="@layout/activity_elo_trend">-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/region_elo_trend">
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/elo_trend_line_chart"
@@ -80,5 +84,23 @@
         </RelativeLayout>
     </RelativeLayout>
 
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/region_no_games"
+        android:visibility="gone">
+        <TextView
+            android:id="@+id/no_games_played_warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:text="@string/no_games_played_jet"
+            android:textAlignment="center"
+            android:textSize="13pt"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_centerHorizontal="true"
+            android:padding="20dp"/>
+    </RelativeLayout>
 
 </RelativeLayout>

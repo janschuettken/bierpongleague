@@ -1,5 +1,7 @@
 package jan.schuettken.bierpongleague.activities;
 
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
@@ -129,6 +131,7 @@ public class MyAreasActivity extends BasicDrawerPage {
                 });
 
             } catch (NoConnectionException | SessionErrorException | JSONException e) {
+                e.printStackTrace();
                 //no games are played
                 handler.post(() -> {
 //                    findViewById(R.id.no_games_played_warning).setVisibility(View.VISIBLE);
@@ -145,7 +148,7 @@ public class MyAreasActivity extends BasicDrawerPage {
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setEnabled(true);
-//        input.setText("04fmkSzAcA");
+        input.setText(preloadTextField());
         builder.setView(input);
         builder.setPositiveButton(R.string.button_ok, (dialog, which) -> {
             String code = input.getText().toString();
@@ -153,7 +156,10 @@ public class MyAreasActivity extends BasicDrawerPage {
                 new Thread(() -> {
                     try {
                         apiHandler.addUserToAreaWithCode(code);
-                        handler.post(() -> showToast(R.string.player_added));
+                        handler.post(() -> {
+                            showToast(R.string.player_added);
+                            loadAreas();
+                        });
                     } catch (NoConnectionException | SessionErrorException e) {
                         e.printStackTrace();
                     } catch (UserAlreadyInAreaException e) {
@@ -166,5 +172,21 @@ public class MyAreasActivity extends BasicDrawerPage {
         });
         builder.setNegativeButton(R.string.button_cancel, (dialog, which) -> dialog.cancel());
         builder.show();
+    }
+
+    private String preloadTextField() {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        final int LENGH_OF_CODE = 10;//10 is the lengh of the area Codes
+        if (clipboard != null)
+            if (clipboard.getPrimaryClip() != null)
+                if (clipboard.getPrimaryClip().getItemCount() > 0) {
+                    String copy = clipboard.getPrimaryClip().getItemAt(0).getText().toString();
+                    if (copy.length() == LENGH_OF_CODE) {
+                        showToast(R.string.code_from_clipboard);
+                        return copy;
+                    }
+
+                }
+        return "";
     }
 }

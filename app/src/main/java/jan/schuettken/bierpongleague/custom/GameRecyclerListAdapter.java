@@ -5,8 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +12,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -31,6 +32,7 @@ import jan.schuettken.bierpongleague.exceptions.EmptyPreferencesException;
 import jan.schuettken.bierpongleague.exceptions.InvalidLoginException;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
+import jan.schuettken.bierpongleague.exceptions.UserNotAdminException;
 import jan.schuettken.bierpongleague.handler.ApiHandler;
 import jan.schuettken.bierpongleague.handler.PreferencesHandler;
 
@@ -151,6 +153,18 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
         player = vi.findViewById(R.id.text_score_team_b);
         player.setText(game.getScores()[1] + "");
 
+        boolean showDelete = false;
+
+        if (currentUser != null && game.getAdmin() != null && (currentUser.getId() == game.getAdmin().getId())) {
+            for (UserData ud : game.getParticipants()) {
+                if (!game.hasConfirmed(ud.getId()))
+                    showDelete = true;
+            }
+        }
+        Button delete = vi.findViewById(R.id.button_delete_game);
+        delete.setOnClickListener(v -> deleteGame(game.getGameId(), currentUser));
+        vi.findViewById(R.id.region_delete_game).setVisibility(showDelete ? View.VISIBLE : View.GONE);
+
         if (game.getScores()[0] < game.getScores()[1]) {//the blue/green team is always the winner
             RelativeLayout rl = vi.findViewById(R.id.color_region_player);
             Drawable d = context.getDrawable(R.drawable.color_red_gradient);
@@ -172,7 +186,8 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
             vi.findViewById(R.id.imageView_crone).setVisibility(View.VISIBLE);
             vi.findViewById(R.id.imageView_crone_team_b).setVisibility(View.INVISIBLE);
         }
-        if (currentUser == null || game.hasConfirmed(currentUser.getId()))
+        if ((currentUser == null || game.hasConfirmed(currentUser.getId()))
+                || (game.getScores()[0] < 0 || game.getScores()[1] < 0))
             vi.findViewById(R.id.region_confirmGame).setVisibility(View.GONE);
         else {
             vi.findViewById(R.id.region_confirmGame).setVisibility(View.VISIBLE);
@@ -194,8 +209,6 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
             firstName.setTextColor(context.getColor(R.color.colorGreyLight));
             lastName.setTextColor(context.getColor(R.color.colorGreyLight));
         }
-
-
     }
 
     private void confirmGame(final int gameId, final boolean confirm) {
@@ -203,38 +216,67 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
         final Handler handler = new Handler();
         final PreferencesHandler prefHandler = new PreferencesHandler(context);
 
-        new Thread() {
-            @Override
-            public void run() {
+        new Thread(() -> {
 
-                try {//TODO test case
-                    Thread.sleep(200);
-                } catch (InterruptedException ignored) {
+            try {//TODO test case
+                Thread.sleep(200);
+            } catch (InterruptedException ignored) {
+            }
+            if (apiHandler == null) {
+                Log.e("CONFIRM", "apiHandler == null");
+                return;
+            }
+            try {
+                if (apiHandler.confirmGame(gameId, confirm)) {
+                    showConfirmInfoAndReload(handler);
                 }
-                if (apiHandler == null) {
-                    Log.e("CONFIRM", "apiHandler == null");
-                    return;
-                }
+            } catch (SessionErrorException | NoConnectionException e) {
+                e.printStackTrace();
                 try {
+                    apiHandler = new ApiHandler(prefHandler.getUsername(), prefHandler.getPassword(), context);
                     if (apiHandler.confirmGame(gameId, confirm)) {
                         showConfirmInfoAndReload(handler);
                     }
-                } catch (SessionErrorException | NoConnectionException e) {
-                    e.printStackTrace();
-                    try {
-                        apiHandler = new ApiHandler(prefHandler.getUsername(), prefHandler.getPassword(), context);
-                        if (apiHandler.confirmGame(gameId, confirm)) {
-                            showConfirmInfoAndReload(handler);
-                        }
-                    } catch (SessionErrorException | InvalidLoginException | NoConnectionException | DatabaseException | EmptyPreferencesException e1) {
-                        e1.printStackTrace();
-                        showProgress(false, handler);
-                        context.switchView(LoginActivity.class, true, handler);
-                    }
+                } catch (SessionErrorException | InvalidLoginException | NoConnectionException | DatabaseException | EmptyPreferencesException e1) {
+                    e1.printStackTrace();
+                    showProgress(false, handler);
+                    context.switchView(LoginActivity.class, true, handler);
                 }
-
             }
-        }.start();
+
+        }).start();
+
+    }
+
+    private void deleteGame(final int gameId, final UserData admin) {
+        showProgress(true);
+        final Handler handler = new Handler();
+        final PreferencesHandler prefHandler = new PreferencesHandler(context);
+
+        new Thread(() -> {
+            if (apiHandler == null) {
+                Log.e("CONFIRM", "apiHandler == null");
+                return;
+            }
+            try {
+                apiHandler.deleteGame(gameId, admin.getId());
+                showConfirmInfoAndReload(handler);
+            } catch (SessionErrorException | NoConnectionException e) {
+                e.printStackTrace();
+                try {
+                    apiHandler = new ApiHandler(prefHandler.getUsername(), prefHandler.getPassword(), context);
+                    apiHandler.deleteGame(gameId, admin.getId());
+                    showConfirmDeleteInfoAndReload(handler);
+                } catch (SessionErrorException | InvalidLoginException | NoConnectionException | DatabaseException | EmptyPreferencesException | UserNotAdminException e1) {
+                    e1.printStackTrace();
+                    showProgress(false, handler);
+                    context.switchView(LoginActivity.class, true, handler);
+                }
+            } catch (UserNotAdminException e) {
+                context.showToast(R.string.you_are_not_admin);
+            }
+
+        }).start();
 
     }
 
@@ -246,6 +288,14 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
         });
     }
 
+    private void showConfirmDeleteInfoAndReload(Handler handler) {
+        handler.post(() -> {
+            context.showToast(R.string.game_deleted);
+            showProgressDeleted(false);
+            context.loadGames();
+        });
+    }
+
     private void showProgress(final boolean show, Handler handler) {
         handler.post(() -> showProgress(show));
     }
@@ -253,6 +303,13 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
     private void showProgress(final boolean show) {
         try {
             showProgress(show, context.findViewById(R.id.progress_confirm_region), context.findViewById(R.id.progress_confirm_bg));
+        } catch (NullPointerException ignored) {
+        }
+    }
+
+    private void showProgressDeleted(final boolean show) {
+        try {
+            showProgress(show, context.findViewById(R.id.progress_delete_region), context.findViewById(R.id.progress_delete_bg));
         } catch (NullPointerException ignored) {
         }
     }

@@ -1,9 +1,9 @@
 package jan.schuettken.bierpongleague.activities;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -25,6 +25,7 @@ import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.basic.BasicDrawerPage;
 import jan.schuettken.bierpongleague.data.EloData;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
+import jan.schuettken.bierpongleague.exceptions.NoGamesException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
 import jan.schuettken.bierpongleague.handler.ApiHandler;
 
@@ -100,10 +101,7 @@ public class EloTrendActivity extends BasicDrawerPage {
 
     private void refreshLineChart() {
 
-        new Thread() {
-            @Override
-            public void run() {
-
+        new Thread(()-> {
                 try {
                     List<EloData> elos = apiHandler.getEloLog();
                     final List<Entry> lineEntries = new ArrayList<>();
@@ -137,24 +135,26 @@ public class EloTrendActivity extends BasicDrawerPage {
                         lineChart.setData(lineData);
 
                         final int finalMinElo = (int) minElo, finalMaxElo = (int) maxElo;
-                        handler.post(new Runnable() {
-                            @SuppressLint("SetTextI18n")
-                            @Override
-                            public void run() {
-                                lineChart.invalidate();
-                                TextView tv = findViewById(R.id.textViewMinValue);
-                                tv.setText(finalMinElo + "");
-                                tv = findViewById(R.id.textViewMaxValue);
-                                tv.setText(finalMaxElo + "");
-                            }
+                        handler.post(() -> {
+                            findViewById(R.id.region_elo_trend).setVisibility(View.VISIBLE);
+                            findViewById(R.id.region_no_games).setVisibility(View.GONE);
+                            lineChart.invalidate();
+                            TextView tv = findViewById(R.id.textViewMinValue);
+                            tv.setText(finalMinElo + "");
+                            tv = findViewById(R.id.textViewMaxValue);
+                            tv.setText(finalMaxElo + "");
                         });
                     } else
                         throw new RuntimeException("No Entries for Data to show!");
                 } catch (JSONException | SessionErrorException | NoConnectionException e) {
                     e.printStackTrace();
+                } catch (NoGamesException e) {
+                    handler.post(() -> {
+                        findViewById(R.id.region_elo_trend).setVisibility(View.GONE);
+                        findViewById(R.id.region_no_games).setVisibility(View.VISIBLE);
+                    });
                 }
-            }
-        }.start();
+        }).start();
     }
 
 

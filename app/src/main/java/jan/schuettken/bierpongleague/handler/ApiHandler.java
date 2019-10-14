@@ -23,9 +23,11 @@ import jan.schuettken.bierpongleague.exceptions.MailNotTakenException;
 import jan.schuettken.bierpongleague.exceptions.MailTakenException;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
 import jan.schuettken.bierpongleague.exceptions.NoGamesException;
+import jan.schuettken.bierpongleague.exceptions.NoScoreboardException;
 import jan.schuettken.bierpongleague.exceptions.NotEnoughPowerException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
 import jan.schuettken.bierpongleague.exceptions.UserAlreadyInAreaException;
+import jan.schuettken.bierpongleague.exceptions.UserNotAdminException;
 import jan.schuettken.bierpongleague.exceptions.UserNotInAreaException;
 import jan.schuettken.bierpongleague.exceptions.UsernameTakenException;
 import jan.schuettken.bierpongleague.exceptions.WrongOldPasswordException;
@@ -214,6 +216,8 @@ public class ApiHandler {
         fileUrl += "&scoreB=" + scores[1];
         fileUrl += "&areaId=" + areaId;
 
+        Log.e("addGame", fileUrl);
+
         if (description.length > 0)
             fileUrl += "&description=" + description[0];
         String response = serverHandler.getJsonFromServer(fileUrl);
@@ -228,6 +232,46 @@ public class ApiHandler {
         if (response.startsWith("#fail#"))
             throw new RuntimeException(response);
         return true;
+    }
+
+    public void deleteGame(@NotNull GameData game, @NotNull UserData admin) throws NoConnectionException, UserNotAdminException, SessionErrorException {
+        String fileUrl = SERVER_URL + "deleteGame.php?session=" + session;
+        fileUrl += "&game=" + game.getGameId();
+        fileUrl += "&user=" + admin.getId();
+
+        Log.e("deleteGame", fileUrl);
+
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response.equalsIgnoreCase("#fail#you are not the admin")) {
+            Log.e("deleteGame", fileUrl);
+            throw new UserNotAdminException();
+        }
+        if (response.equalsIgnoreCase("#fail#session error")) {
+            Log.e("deleteGame", fileUrl);
+            throw new SessionErrorException(response);
+        }
+        if (response.startsWith("#fail#"))
+            throw new NoConnectionException(response);
+    }
+
+    public void deleteGame(int game, int admin) throws NoConnectionException, UserNotAdminException, SessionErrorException {
+        String fileUrl = SERVER_URL + "deleteGame.php?session=" + session;
+        fileUrl += "&game=" + game;
+        fileUrl += "&user=" + admin;
+
+        Log.e("deleteGame", fileUrl);
+
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response.equalsIgnoreCase("#fail#you are not the admin")) {
+            Log.e("deleteGame", fileUrl);
+            throw new UserNotAdminException();
+        }
+        if (response.equalsIgnoreCase("#fail#session error")) {
+            Log.e("deleteGame", fileUrl);
+            throw new SessionErrorException(response);
+        }
+        if (response.startsWith("#fail#"))
+            throw new NoConnectionException(response);
     }
 
     /**
@@ -340,6 +384,7 @@ public class ApiHandler {
         String fileUrl = SERVER_URL + "getGame.php?session=" + session;
         fileUrl += "&userId=" + userId;
         String response = serverHandler.getJsonFromServer(fileUrl);
+        Log.e("getGames", fileUrl);
         if (response == null)
             throw new NoGamesException("No games played jet");
         if (response.equalsIgnoreCase("#fail#session error"))
@@ -410,6 +455,32 @@ public class ApiHandler {
         return games;
     }
 
+    public List<GameData> getGameAdmins(List<GameData> games) throws JSONException, SessionErrorException, NoConnectionException {
+        String fileUrl = SERVER_URL + "getGameAdmin.php?session=" + session;
+        String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response == null)
+            throw new JSONException("Nothing to show here");
+        if (response.equalsIgnoreCase("#fail#session error"))
+            throw new SessionErrorException(response);
+        if (response.startsWith("#fail#"))
+            throw new RuntimeException(response);
+
+        JSONArray gameObjects = new JSONArray(response);
+        for (int i = 0; i < gameObjects.length(); i++) {
+            JSONObject c = gameObjects.getJSONObject(i);
+            int gameId = c.getInt("GameId");
+            int userId = c.getInt("Id");
+            UserData admin = new UserData().setId(userId);
+            for (GameData gd : games) {
+                if (gd.getGameId() == gameId) {
+                    gd.setAdmin(admin);
+                    break;
+                }
+            }
+        }
+        return games;
+    }
+
     /**
      * @return a list of all Areas
      * @throws SessionErrorException session is not set or outdated
@@ -422,6 +493,7 @@ public class ApiHandler {
             throws SessionErrorException, NoConnectionException, RuntimeException, JSONException {
         String fileUrl = SERVER_URL + "getMyAreas.php?session=" + session;
         String response = serverHandler.getJsonFromServer(fileUrl);
+        Log.e("getAreas", fileUrl);
         if (response == null)
             throw new JSONException("Nothing to show here");
         if (response.equalsIgnoreCase("#fail#session error"))
@@ -470,7 +542,8 @@ public class ApiHandler {
         String response = serverHandler.getJsonFromServer(fileUrl);
         Log.e("getAreaUsers", fileUrl);
         if (response == null)
-            throw new JSONException("Nothing to show here");
+            return areas;
+//            throw new JSONException("Nothing to show here");
         if (response.equalsIgnoreCase("#fail#session error"))
             throw new SessionErrorException(response);
         if (response.startsWith("#fail#"))
@@ -525,13 +598,18 @@ public class ApiHandler {
      * @throws JSONException         the file is bad - might be an server problem
      * @throws RuntimeException      in here the server response is stored
      */
-    public List<UserData> getScoreboard() throws JSONException, SessionErrorException, RuntimeException, NoConnectionException {
+    public List<UserData> getScoreboard() throws JSONException, SessionErrorException, RuntimeException, NoConnectionException, NoScoreboardException {
         String fileUrl = SERVER_URL + "getMyScoreboard.php?session=" + session;
         String response = serverHandler.getJsonFromServer(fileUrl);
+
+        if (response == null)
+            throw new NoScoreboardException();
+        if (response.startsWith("#fail#"))
+            Log.e("getScoreboard", fileUrl);
         if (response.equalsIgnoreCase("#fail#session error"))
             throw new SessionErrorException(response);
         if (response.startsWith("#fail#"))
-            throw new RuntimeException(response);
+            throw new NoConnectionException(response);
 
         JSONArray gameObjects = new JSONArray(response);
 
@@ -551,7 +629,7 @@ public class ApiHandler {
      * @throws JSONException         the file is bad - might be an server problem
      * @throws RuntimeException      in here the server response is stored
      */
-    public List<EloData> getEloLog() throws JSONException, SessionErrorException, RuntimeException, NoConnectionException {
+    public List<EloData> getEloLog() throws JSONException, SessionErrorException, RuntimeException, NoConnectionException, NoGamesException {
         return getEloLog(0);
     }
 
@@ -563,15 +641,17 @@ public class ApiHandler {
      * @throws JSONException         the file is bad - might be an server problem
      * @throws RuntimeException      in here the server response is stored
      */
-    public List<EloData> getEloLog(int userId) throws JSONException, SessionErrorException, RuntimeException, NoConnectionException {
+    public List<EloData> getEloLog(int userId) throws JSONException, SessionErrorException, RuntimeException, NoConnectionException, NoGamesException {
         String fileUrl = SERVER_URL + "getEloLog.php?session=" + session;
         if (userId > 0)
             fileUrl += "&userId=" + userId;
         String response = serverHandler.getJsonFromServer(fileUrl);
+        if (response == null)
+            throw new NoGamesException();
         if (response.equalsIgnoreCase("#fail#session error"))
             throw new SessionErrorException(response);
         if (response.startsWith("#fail#"))
-            throw new RuntimeException(response);
+            throw new NoConnectionException(response);
 
         JSONArray gameObjects = new JSONArray(response);
 

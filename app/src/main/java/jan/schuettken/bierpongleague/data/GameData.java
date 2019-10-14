@@ -32,9 +32,13 @@ public class GameData {
      */
     private int[] scores;
     /**
-     * The Area/League the game is placed in - currently only id 1
+     * The Area/League the game is placed in
      */
     private int areaId;
+    /**
+     * The ID of the game Admin
+     */
+    private UserData admin = null;
     /**
      * The Id of the game only for existing games
      */
@@ -269,5 +273,13 @@ public class GameData {
             this.date = null;
             e.printStackTrace();
         }
+    }
+
+    public UserData getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(UserData admin) {
+        this.admin = admin;
     }
 }

@@ -20,6 +20,7 @@ import jan.schuettken.bierpongleague.custom.ScoreboardRecyclerListAdapter;
 import jan.schuettken.bierpongleague.custom.SimpleItemTouchHelperCallback;
 import jan.schuettken.bierpongleague.data.UserData;
 import jan.schuettken.bierpongleague.exceptions.NoConnectionException;
+import jan.schuettken.bierpongleague.exceptions.NoScoreboardException;
 import jan.schuettken.bierpongleague.exceptions.SessionErrorException;
 import jan.schuettken.bierpongleague.handler.ApiHandler;
 
@@ -36,8 +37,8 @@ public class ScoreboardActivity extends BasicDrawerPage {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_played_games);
-        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.played_games);
+        setContentView(R.layout.activity_scoreboard);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.scoreboard);
         handler = new Handler();
         initializeRefreshListener();
         initializeList();
@@ -95,13 +96,15 @@ public class ScoreboardActivity extends BasicDrawerPage {
                 return;
             try {
                 final List<UserData> _games = apiHandler.getScoreboard();
-                List<UserData> games = new ArrayList<>();
+                List<UserData> users = new ArrayList<>();
+                if (currentUser == null)
+                    currentUser = apiHandler.getYourself();
                 for (UserData ud : _games)
-                    if (ud.getElo() != 0)
-                        games.add(ud);
+                    if (ud.getElo() != 0 || ud.getId() == currentUser.getId())
+                        users.add(ud);
                 handler.post(() -> {
                     recyclerList.getItems().clear();
-                    recyclerList.getItems().addAll(games);
+                    recyclerList.getItems().addAll(users);
                     templateList.setAdapter(recyclerList);
                     swipeContainer.setRefreshing(false);
                 });
@@ -109,6 +112,8 @@ public class ScoreboardActivity extends BasicDrawerPage {
             } catch (NoConnectionException | SessionErrorException | JSONException e) {
                 //should not happen
                 e.printStackTrace();
+            } catch (NoScoreboardException e) {
+
             }
         }).start();
     }

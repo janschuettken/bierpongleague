@@ -2,11 +2,12 @@ package jan.schuettken.bierpongleague.activities;
 
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import android.view.View;
+
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import android.view.View;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import org.json.JSONException;
 
@@ -95,6 +96,7 @@ public class PlayedGamesActivity extends BasicDrawerPage {
             try {
                 final List<AreaData> areas = apiHandler.getAreas();
                 final List<GameData> games = apiHandler.getGames(apiHandler.getYourself(), true);
+                apiHandler.getGameAdmins(games);
                 handler.post(() -> {
                     findViewById(R.id.no_games_played_warning).setVisibility(View.GONE);
                     recyclerList.setAreas(areas);

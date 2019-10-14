@@ -239,7 +239,7 @@
                 tools:ignore="ButtonStyle" />
         </LinearLayout>
 
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <RelativeLayout
             android:id="@+id/progress_confirm_region"
             android:layout_width="310dp"
             android:layout_height="50dp"
@@ -258,7 +258,60 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:alpha="0.3"
-                android:background="@color/colorPrimary"></RelativeLayout>
+                android:background="@color/colorPrimary" />
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true" />
+        </RelativeLayout>
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/region_delete_game"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/region_confirmGame"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp">
+
+        <LinearLayout
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_delete_game"
+                android:layout_width="170dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/border_red"
+                android:text="@string/delete_game"
+                tools:ignore="ButtonStyle" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/progress_delete_region"
+            android:layout_width="310dp"
+            android:layout_height="50dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/progress_delete"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true" />
+
+            <RelativeLayout
+                android:id="@+id/progress_delete_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0.3"
+                android:background="@color/colorPrimary" />
 
             <ProgressBar
                 style="?android:attr/progressBarStyleLarge"
@@ -272,7 +325,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/region_confirmGame"
+        android:layout_below="@+id/region_delete_game"
         android:layout_marginTop="5dp"
         android:background="@drawable/settings_border" />
 </RelativeLayout>
