@@ -10,7 +10,10 @@
         android:roundIcon="@drawable/ic_logo_v3_2"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning"
+        android:usesCleartextTraffic="true">
+
+
         <activity
             android:name=".activities.OverviewActivity"
             android:label="@string/app_name"
@@ -34,6 +37,9 @@
             android:parentActivityName=".activities.OverviewActivity" />
         <activity
             android:name=".activities.PlayedGamesActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.ArrangeActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.ConfirmActivity"

@@ -134,4 +134,9 @@
     <string name="delete_game">Spiel löschen</string>
     <string name="you_are_not_admin">Du bist nicht der Admin des Spiels</string>
     <string name="game_deleted">Spiel gelöscht</string>
+    <string name="arrange">Zusammenstellen</string>
+    <string name="to_clippord">In Zwischenablage</string>
+    <string name="added_to_clippboard">Link in Zischenabelage übernommen</string>
+    <string name="open">Öffnen</string>
+    <string name="moved_info">Die BeerPongLeage ist umgezogen, du findest sie nun als WebApp. Möchtest du den Link jetzt öffnen?</string>
 </resources>

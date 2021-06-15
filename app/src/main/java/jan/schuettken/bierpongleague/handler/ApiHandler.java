@@ -309,7 +309,7 @@ public class ApiHandler {
      */
     public boolean login(@NotNull String username, @NotNull String password, @NotNull String version)
             throws NoConnectionException, InvalidLoginException, DatabaseException {
-        String fileUrl = SERVER_URL + "login.php?user=" + username + "&password=" + password + "&version=Android " + version;
+        String fileUrl = SERVER_URL + "login.php?user=" + username + "&password=" + password;// + "&version=Android " + version;
         //Log.e("LOGIN", fileUrl);
         String response = serverHandler.getJsonFromServer(fileUrl);
         //Log.e("LOGIN", response);

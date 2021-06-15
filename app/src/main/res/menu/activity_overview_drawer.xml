@@ -15,6 +15,10 @@
             android:icon="@drawable/ic_format_list_bulleted_black_24dp"
             android:title="@string/played_games" />
         <item
+            android:id="@+id/nav_arrange"
+            android:icon="@drawable/ic_compare_arrows_black_24dp"
+            android:title="@string/arrange" />
+        <item
             android:id="@+id/nav_to_confirm"
             android:icon="@drawable/ic_playlist_add_check_black_24dp"
             android:title="@string/to_confirm"

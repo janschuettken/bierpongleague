@@ -32,6 +32,7 @@ import java.util.List;
 
 import jan.schuettken.bierpongleague.R;
 import jan.schuettken.bierpongleague.activities.AddGameActivity;
+import jan.schuettken.bierpongleague.activities.ArrangeActivity;
 import jan.schuettken.bierpongleague.activities.ConfirmActivity;
 import jan.schuettken.bierpongleague.activities.EloTrendActivity;
 import jan.schuettken.bierpongleague.activities.LoginActivity;
@@ -149,6 +150,11 @@ public abstract class BasicDrawerPage extends BasicPage implements NavigationVie
             case R.id.nav_profile:
                 if (!(this instanceof ProfileSettingsActivity)) {
                     switchView(ProfileSettingsActivity.class, true, new Portable(CURRENT_USER, currentUser));
+                }
+                break;
+            case R.id.nav_arrange:
+                if (!(this instanceof ArrangeActivity)) {
+                    switchView(ArrangeActivity.class, true, new Portable(CURRENT_USER, currentUser));
                 }
                 break;
             case R.id.nav_share:

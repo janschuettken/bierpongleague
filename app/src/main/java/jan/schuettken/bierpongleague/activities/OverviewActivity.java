@@ -139,7 +139,6 @@ public class OverviewActivity extends BasicDrawerPage {
             }
             final int finalI = i;
             handler.post(() -> eloField.setText(((int) (increase * finalI)) + ""));
-
         }
 
     }

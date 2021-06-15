@@ -44,9 +44,7 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
 
     private List<GameData> items = new LinkedList<>();
     private List<AreaData> areas = new LinkedList<>();
-    private ListAction action;
     private PlayedGamesActivity context;
-    private View view;
     private ApiHandler apiHandler;
     private UserData currentUser;
 
@@ -76,7 +74,6 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
                 Collections.swap(items, i, i - 1);
             }
         }
-        itemMoved(fromPosition, toPosition);
         notifyItemMoved(fromPosition, toPosition);
     }
 
@@ -96,7 +93,6 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
     @Override
     public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_game, parent, false);
-        view = parent;
         return new ItemViewHolder(v);
     }
 
@@ -260,7 +256,7 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
             }
             try {
                 apiHandler.deleteGame(gameId, admin.getId());
-                showConfirmInfoAndReload(handler);
+                showConfirmDeleteInfoAndReload(handler);
             } catch (SessionErrorException | NoConnectionException e) {
                 e.printStackTrace();
                 try {
@@ -333,18 +329,6 @@ public class GameRecyclerListAdapter extends RecyclerView.Adapter<ItemViewHolder
     @Override
     public int getItemCount() {
         return items.size();
-    }
-
-    public void itemMoved(int fromPosition, int toPosition) {
-        //disable here
-    }
-
-    public void setOnItemClickListener(ListAction action) {
-        setAction(action);
-    }
-
-    public void setAction(ListAction action) {
-        this.action = action;
     }
 
     public void scroll(int index) {

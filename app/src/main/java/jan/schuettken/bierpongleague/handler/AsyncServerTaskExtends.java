@@ -1,6 +1,7 @@
 package jan.schuettken.bierpongleague.handler;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -38,6 +39,7 @@ class AsyncServerTaskExtends extends AsyncTask<String, Integer, String> {
             BufferedReader inputStream;
 
             URL jsonUrl = new URL(url);
+            Log.e("URLx", jsonUrl.toString());
             URLConnection dc = jsonUrl.openConnection();
             dc.setConnectTimeout(timeOutMillis);
             dc.setReadTimeout(timeOutMillis);
@@ -45,6 +47,7 @@ class AsyncServerTaskExtends extends AsyncTask<String, Integer, String> {
             // read the JSON results into a string
             return inputStream.readLine();
         } catch (Exception e) {
+            Log.e("URL", url);
             e.printStackTrace();
             throw new NoConnectionException();
         }

@@ -2,11 +2,13 @@ package jan.schuettken.bierpongleague.handler;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.DatePicker;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Objects;
 
@@ -119,6 +121,11 @@ public class DialogHandler {
 
             });
         return builder;
+    }
+
+    public void showAlterDialog
+            (int title, int body, int positive, final ActionInterface pos_a, int negative, final ActionInterface neg_a, int cancel, final ActionInterface can_a, Context context) {
+        getAlterDialog(title, body, positive, pos_a, negative, neg_a, cancel, can_a, context).show();
     }
 
     public AlertDialog.Builder getAlterDialog

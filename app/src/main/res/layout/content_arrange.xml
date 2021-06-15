@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".activities.OverviewActivity">
+    <!--    tools:showIn="@layout/activity_scoreboard">-->
+
+    <RelativeLayout
+        android:id="@+id/region_cups"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp">
+
+        <RelativeLayout
+            android:id="@+id/cup1"
+            android:layout_width="@dimen/cup_size"
+            android:layout_height="@dimen/cup_size"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/round_white" />
+
+        <RelativeLayout
+            android:id="@+id/region_line1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/cup1"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="-10dp">
+
+            <RelativeLayout
+                android:id="@+id/cup2"
+                android:layout_width="@dimen/cup_size"
+                android:layout_height="@dimen/cup_size"
+                android:background="@drawable/round_white" />
+
+            <RelativeLayout
+                android:id="@+id/cup3"
+                android:layout_width="@dimen/cup_size"
+                android:layout_height="@dimen/cup_size"
+                android:layout_marginStart="5dp"
+                android:layout_toEndOf="@id/cup2"
+                android:background="@drawable/round_white" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/region_line2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/region_line1"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="-10dp">
+
+            <RelativeLayout
+                android:id="@+id/cup4"
+                android:layout_width="@dimen/cup_size"
+                android:layout_height="@dimen/cup_size"
+                android:background="@drawable/round_white" />
+
+            <RelativeLayout
+                android:id="@+id/cup5"
+                android:layout_width="@dimen/cup_size"
+                android:layout_height="@dimen/cup_size"
+                android:layout_marginStart="5dp"
+                android:layout_toEndOf="@id/cup4"
+                android:background="@drawable/round_white" />
+
+            <RelativeLayout
+                android:id="@+id/cup6"
+                android:layout_width="@dimen/cup_size"
+                android:layout_height="@dimen/cup_size"
+                android:layout_marginStart="5dp"
+                android:layout_toEndOf="@id/cup5"
+                android:background="@drawable/round_white" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/region_line3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/region_line2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="-10dp">
+
+            <RelativeLayout
+                android:id="@+id/cup7"
+                android:layout_width="@dimen/cup_size"
+                android:layout_height="@dimen/cup_size"
+                android:background="@drawable/round_white" />
+
+            <RelativeLayout
+                android:id="@+id/cup8"
+                android:layout_width="@dimen/cup_size"
+                android:layout_height="@dimen/cup_size"
+                android:layout_marginStart="5dp"
+                android:layout_toEndOf="@id/cup7"
+                android:background="@drawable/round_white" />
+
+            <RelativeLayout
+                android:id="@+id/cup9"
+                android:layout_width="@dimen/cup_size"
+                android:layout_height="@dimen/cup_size"
+                android:layout_marginStart="5dp"
+                android:layout_toEndOf="@id/cup8"
+                android:background="@drawable/round_white" />
+
+            <RelativeLayout
+                android:id="@+id/cup10"
+                android:layout_width="@dimen/cup_size"
+                android:layout_height="@dimen/cup_size"
+                android:layout_marginStart="5dp"
+                android:layout_toEndOf="@id/cup9"
+                android:background="@drawable/round_white" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/button_arrange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_button_white"
+        android:text="@string/arrange"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/region_cups"
+        android:layout_marginTop="75dp"/>
+</RelativeLayout>
